@@ -40,6 +40,7 @@ Module.register("MMM-SL-PublicTransport", {
     // --------------------------------------- Start the module
     start: function() {
         Log.info("Starting module: " + this.name);
+        console.log("++++++++ Starting module: " + this.name);
         this.loaded = false;
         this.sendSocketNotification('CONFIG', this.config); // Send config to helper and initiate an update
         
