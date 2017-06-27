@@ -9,7 +9,7 @@ You need to obtain your own API key's from TrafikLab for the following API's
 
 ## Install
 1. Clone repository into ``../modules/`` inside your MagicMirror folder.
-2. Run npm install inside ``../modules/MMM-HH-LocalTransport/`` folder
+2. Run ``npm install`` inside ``../modules/MMM-HH-LocalTransport/`` folder
 3. Run ``node findStation.js apiKey apiUser stationName`` to find out your Station ID.
 4. Add the module to the MagicMirror config
 
@@ -22,7 +22,10 @@ modules: [
         position: 'top-right'
         config: {
             apikey: 'your-api-key',
-            stationid: 'your-station-id' // You need to run the utility findStation to get this
+            stationid: 'your-station-id', // You need to run the utility findStation to get this
+            direction: 1,   // Optional, if set only show departures in that direction
+            lines: [],      // Optional, only show the lines listed in the array
+            showdisturbances: false, // Not implemented yet
         }
     },
     ...
