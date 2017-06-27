@@ -33,10 +33,10 @@ Module.register("MMM-SL-PublicTransport", {
     },
 
     // --------------------------------------- Define required stylesheets
-    getStyles: function() {
+/*    getStyles: function() {
         return ["MMM-SL-PublicTransport.css", "font-awesome.css"];
     },
-
+*/
     // --------------------------------------- Start the module
     start: function() {
         Log.info("Starting module: " + this.name);
