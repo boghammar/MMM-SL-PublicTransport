@@ -19,7 +19,7 @@ module.exports = NodeHelper.create({
 
     // --------------------------------------- Start the helper
     start: function() {
-        Log.info('Starting helper: '+ this.name);
+        //Log.info('Starting helper: '+ this.name);
         this.started = false;
     },
 
@@ -33,7 +33,7 @@ module.exports = NodeHelper.create({
 
     // --------------------------------------- Retrive departure info
     getDepartures: function() {
-        Log.info('Getting departures for station id ' + this.station.SiteId);
+        //Log.info('Getting departures for station id ' + this.station.SiteId);
         var opt = {
             uri: 'https://api.sl.se/api2/realtimedeparturesV4.json',
             qs : {
@@ -43,7 +43,7 @@ module.exports = NodeHelper.create({
             },
             json: true
         };
-        Log.info('Calling '+opt.uri);
+        //Log.info('Calling '+opt.uri);
         request(opt)
             .then(function(resp) {
                 if (resp.StatusCode == 0) {
@@ -60,11 +60,11 @@ module.exports = NodeHelper.create({
                     self.departures.sort(dynamicSort('-JourneyDirection'));
                     // TODO:Handle resp.ResponseData.StopPointDeviations
                 } else {
-                    Log.info("Something went wrong: " + resp.StatusCode + ': '+ resp.Message);
+                    //Log.info("Something went wrong: " + resp.StatusCode + ': '+ resp.Message);
                 }
             })
             .catch(function(err) {
-                Log.info('Problems: '+err);
+                //Log.info('Problems: '+err);
             });
     },
 
