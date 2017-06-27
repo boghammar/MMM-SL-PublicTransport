@@ -26,6 +26,9 @@ modules: [
             direction: 1,                   // Optional, if set only show departures in that direction
             lines: [],                      // Optional, only show the lines listed in the array
             showdisturbances: false,        // Not implemented yet
+            animationSpeed: 2000,
+            fade: true,
+            fadePoint: 0.25,
         }
     },
     ...

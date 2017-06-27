@@ -28,6 +28,8 @@ Module.register("MMM-SL-PublicTransport", {
         lines: [],
         showdisturbances: false,
         animationSpeed: 2000,
+        fade: true,
+        fadePoint: 0.25,
     },
 
     // --------------------------------------- Define required stylesheets
@@ -90,14 +92,30 @@ Module.register("MMM-SL-PublicTransport", {
             row.appendChild(td);
             td = document.createElement("td");
             td.innerHTML = dep.DisplayTime; // TODO - fix time according to now
+            td.className = "align-right bright";
             row.appendChild(td);
             table.appendChild(row);
+            this.setFade(row, ix, this.currentDepartures.departures.length, this.config.fade, this.config.fadePoint);
         }
 
         wrapper.appendChild(table);
         return wrapper;
     },
 
+    // --------------------------------------- Handle table fading
+    setFade: function(row, ix, len, fade, fadePoint) {
+        if (fade && fadePoint < 1) {
+				if (fadePoint < 0) {
+					fadePoint = 0;
+				}
+				var startingPoint = len * fadePoint;
+				var steps = len - startingPoint;
+				if (ix >= startingPoint) {
+					var currentStep = ix - startingPoint;
+					row.style.opacity = 1 - (1 / steps * currentStep);
+				}
+			}
+    }
     // --------------------------------------- Handle socketnotifications
     socketNotificationReceived: function(notification, payload) {
         if (notification === "DEPARTURES") {
