@@ -115,7 +115,7 @@ Module.register("MMM-SL-PublicTransport", {
 					row.style.opacity = 1 - (1 / steps * currentStep);
 				}
 			}
-    }
+    },
     // --------------------------------------- Handle socketnotifications
     socketNotificationReceived: function(notification, payload) {
         if (notification === "DEPARTURES") {

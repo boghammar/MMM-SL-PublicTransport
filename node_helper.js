@@ -19,6 +19,7 @@ module.exports = NodeHelper.create({
 
     // --------------------------------------- Start the helper
     start: function() {
+        Log.info('Starting helper: '+ this.name);
         this.started = false;
     },
 
