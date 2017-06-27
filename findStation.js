@@ -20,7 +20,7 @@ function getStationId() {
         uri: 'https://api.sl.se/api2/typeahead.json',
         qs : {
             key: apikey,
-            searchstring: self.config.location.replace(' ', '%20'),
+            searchstring: searchstring,
             stationsonly: true
         },
         json: true

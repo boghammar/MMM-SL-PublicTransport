@@ -4,7 +4,8 @@
   "description": "Get departures for a station using the SL API's (Stockholm/Sweden)",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "station": "node findStation.js"
   },
   "repository": {
     "type": "git",
