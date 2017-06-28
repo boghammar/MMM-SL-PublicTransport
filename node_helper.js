@@ -36,7 +36,7 @@ module.exports = NodeHelper.create({
     getDepartures: function() {
         var self = this;
 
-        console.log('Getting departures for station id ' + this.config.stationid);
+        console.log((new Date(Date.now())).toLocaleTimeString() + ': Getting departures for station id ' + this.config.stationid);
         var opt = {
             uri: 'https://api.sl.se/api2/realtimedeparturesV4.json',
             qs : {
@@ -64,7 +64,7 @@ module.exports = NodeHelper.create({
                     self.departures.sort(dynamicSort('-JourneyDirection'));
                     // TODO:Handle resp.ResponseData.StopPointDeviations
                     CurrentDepartures.departures = self.departures;
-                    console.log("Sending DEPARTURES "+CurrentDepartures.departures.length);
+                    console.log((new Date(Date.now())).toLocaleTimeString() + ": Sending DEPARTURES "+CurrentDepartures.departures.length);
                     self.sendSocketNotification('DEPARTURES', CurrentDepartures); // Send departures to module
 
                 } else {
