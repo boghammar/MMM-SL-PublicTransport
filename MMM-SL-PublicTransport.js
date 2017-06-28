@@ -37,6 +37,11 @@ Module.register("MMM-SL-PublicTransport", {
         return ["MMM-SL-PublicTransport.css", "font-awesome.css"];
     },
 */
+    // --------------------------------------- Get header
+    getHeader: function() {
+        return this.data.header + " " + this.config.stationname + " " 
+        + (this.loaded ? this.currentDepartures.LatestUpdate : "");
+    },
     // --------------------------------------- Start the module
     start: function() {
         Log.info("Starting module: " + this.name);
@@ -83,7 +88,7 @@ Module.register("MMM-SL-PublicTransport", {
 
         // ------ Fill in departures
         for (var ix = 0; ix < this.currentDepartures.departures.length; ix++) {
-            var dep = CurrentDepartures.departures[ix];
+            var dep = this.currentDepartures.departures[ix];
             var row = document.createElement("tr");
             var td = document.createElement("td");
             td.innerHTML = dep.LineNumber;
@@ -120,10 +125,10 @@ Module.register("MMM-SL-PublicTransport", {
     // --------------------------------------- Handle socketnotifications
     socketNotificationReceived: function(notification, payload) {
         if (notification === "DEPARTURES") {
-            Log.info("Departures updated");
             this.loaded = true;
             // TODO handle payload
             this.currentDepartures = payload;
+            Log.info("Departures updated: "+ this.currentDepartures.departures.length);
             this.updateDom(this.config.animationSpeed);
         }
     }
