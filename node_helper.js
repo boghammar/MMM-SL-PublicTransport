@@ -35,13 +35,13 @@ module.exports = NodeHelper.create({
     // --------------------------------------- Retrive departure info
     getDepartures: function() {
         var self = this;
-        
-        console.log('Getting departures for station id ' + this.station.SiteId);
+
+        console.log('Getting departures for station id ' + this.config.stationid);
         var opt = {
             uri: 'https://api.sl.se/api2/realtimedeparturesV4.json',
             qs : {
                 key: self.config.apikey,
-                siteid: self.stationid,
+                siteid: self.config.stationid,
                 timewindow: 60
             },
             json: true
@@ -51,9 +51,10 @@ module.exports = NodeHelper.create({
             .then(function(resp) {
                 if (resp.StatusCode == 0) {
                     //console.log(resp);
+                    var CurrentDepartures = {};
                     self.departures = [];
-                    self.LatestUpdate = resp.ResponseData.LatestUpdate; // Anger när realtidsinformationen (DPS) senast uppdaterades.
-                    self.DataAge = resp.ResponseData.DataAge; //Antal sekunder sedan tidsstämpeln LatestUpdate.
+                    CurrentDepartures.LatestUpdate = resp.ResponseData.LatestUpdate; // Anger när realtidsinformationen (DPS) senast uppdaterades.
+                    CurrentDepartures.DataAge = resp.ResponseData.DataAge; //Antal sekunder sedan tidsstämpeln LatestUpdate.
                     self.addDepartures(resp.ResponseData.Metros);
                     self.addDepartures(resp.ResponseData.Buses);
                     self.addDepartures(resp.ResponseData.Trains);
@@ -62,6 +63,10 @@ module.exports = NodeHelper.create({
                     // Sort on direction
                     self.departures.sort(dynamicSort('-JourneyDirection'));
                     // TODO:Handle resp.ResponseData.StopPointDeviations
+                    CurrentDepartures.departures = self.departures;
+                    console.log("Sending DEPARTURES "+CurrentDepartures.departures.length);
+                    this.sendSocketNotification('DEPARTURES', CurrentDepartures); // Send departures to module
+
                 } else {
                     console.log("Something went wrong: " + resp.StatusCode + ': '+ resp.Message);
                 }
@@ -87,6 +92,7 @@ module.exports = NodeHelper.create({
 		    this.config = payload;	     
 		    this.started = true;
 		    self.scheduleUpdate();
+            self.getDepartures(); // Get it first time
         };
     }
 });
