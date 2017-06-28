@@ -22,16 +22,23 @@ Module.register("MMM-SL-PublicTransport", {
     defaults: {
         apikey: 'PleaseProvideYourOwn',
         stationid: '',
+        stationname: '',
         updateInterval: 5*60*1000,
         uiUpdateInterval: 1000,
         direction: '',
         lines: [],
         showdisturbances: false,
-        animationSpeed: 2000,
+        animationSpeed: 0,
         fade: true,
-        fadePoint: 0.25,
+        fadePoint: 0.2,
     },
 
+    // --------------------------------------- Define required scripts
+    getScripts: function() {
+		return [
+			this.file('timehandler.js')
+        ];
+	},
     // --------------------------------------- Define required stylesheets
 /*    getStyles: function() {
         return ["MMM-SL-PublicTransport.css", "font-awesome.css"];
@@ -40,12 +47,14 @@ Module.register("MMM-SL-PublicTransport", {
     // --------------------------------------- Get header
     getHeader: function() {
         return this.data.header + " " + this.config.stationname + " " 
-        + (this.loaded ? this.currentDepartures.LatestUpdate : "");
+        + (this.loaded ? this.TimeHandler.getTime(this.currentDepartures.LatestUpdate) : "");
     },
+    
     // --------------------------------------- Start the module
     start: function() {
         Log.info("Starting module: " + this.name);
-        console.log("++++++++ Starting module: " + this.name);
+
+        this.TimeHandler = new TimeHandler();
         this.loaded = false;
         this.sendSocketNotification('CONFIG', this.config); // Send config to helper and initiate an update
         
@@ -97,7 +106,7 @@ Module.register("MMM-SL-PublicTransport", {
             td.innerHTML = dep.Destination;
             row.appendChild(td);
             td = document.createElement("td");
-            td.innerHTML = dep.DisplayTime; // TODO - fix time according to now
+            td.innerHTML = this.TimeHandler.TimeLeft(dep.TimeTabledDateTime);//dep.DisplayTime; // TODO - fix time according to now
             td.className = "align-right bright";
             row.appendChild(td);
             table.appendChild(row);
