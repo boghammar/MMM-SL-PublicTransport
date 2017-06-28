@@ -104,6 +104,7 @@ Module.register("MMM-SL-PublicTransport", {
             row.appendChild(td);
             td = document.createElement("td");
             td.innerHTML = dep.Destination;
+            td.className = 'align-left'; 
             row.appendChild(td);
             td = document.createElement("td");
             td.innerHTML = this.TimeHandler.TimeLeft(dep.TimeTabledDateTime);//dep.DisplayTime; // TODO - fix time according to now

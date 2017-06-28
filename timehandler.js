@@ -23,7 +23,7 @@ function TimeHandler() {
  */
 TimeHandler.prototype.TimeLeft = function(time) {
     var tt = this.getDate(time);
-    var now = new Date(Date.now()-(tt.getTimezoneOffset()*60*1000));
+    var now = new Date(Date.now()); //-(tt.getTimezoneOffset()*60*1000));
     var diff = tt.valueOf()-now.valueOf();
     if ( diff <= 0) {
         return 'has left';
@@ -32,7 +32,7 @@ TimeHandler.prototype.TimeLeft = function(time) {
         if (30*1000 < diff && diff <= 60*1000) return 'in 1 min';
         if (60*1000 < diff && diff <= 15*60*1000) return 'in '+ Math.round(diff / (60*1000)) +' min';
     }
-    return 'at ' + this.tpos(tt.getUTCHours()) + ':' + this.tpos(tt.getUTCMinutes());
+    return 'at ' + this.tpos(tt.getHours()) + ':' + this.tpos(tt.getMinutes());
 }
 
 /*
@@ -40,8 +40,8 @@ TimeHandler.prototype.TimeLeft = function(time) {
  */
 TimeHandler.prototype.getTime = function(time, includeseconds) {
     var tt = this.getDate(time);
-    return tt.getUTCHours() + ":" + tt.getUTCMinutes()
-        + (includeseconds !== undefined && includeseconds ? ':' + tt.getUTCSeconds(): '');    
+    return this.tpos(tt.getHours()) + ":" + this.tpos(tt.getMinutes())
+        + (includeseconds !== undefined && includeseconds ? ':' + this.tpos(tt.getSeconds()) : '');    
 }
 
 /*
