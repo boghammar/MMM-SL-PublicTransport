@@ -70,5 +70,5 @@ The output will look something like this (searching for 'Erikslund'):
 
 ## Screenshoot
 
-![SL PublicTransport Module](https://github.com/boghammar/MMM-SL-PublicTransport/blob/master/docs/ScreenShot1.png)
+![SL PublicTransport Module](https://github.com/boghammar/MMM-SL-PublicTransport/blob/master/docs/ScreenShot1.PNG)
 
