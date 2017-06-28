@@ -37,6 +37,11 @@ Module.register("MMM-SL-PublicTransport", {
         return ["MMM-SL-PublicTransport.css", "font-awesome.css"];
     },
 */
+    // --------------------------------------- Get header
+    getHeader: function() {
+        return this.data.header + " " + this.config.stationname + " " 
+        + (this.loaded ? this.currentDepartures.LatestUpdate : "");
+    },
     // --------------------------------------- Start the module
     start: function() {
         Log.info("Starting module: " + this.name);

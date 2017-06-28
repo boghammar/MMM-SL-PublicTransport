@@ -65,7 +65,7 @@ module.exports = NodeHelper.create({
                     // TODO:Handle resp.ResponseData.StopPointDeviations
                     CurrentDepartures.departures = self.departures;
                     console.log("Sending DEPARTURES "+CurrentDepartures.departures.length);
-                    this.sendSocketNotification('DEPARTURES', CurrentDepartures); // Send departures to module
+                    self.sendSocketNotification('DEPARTURES', CurrentDepartures); // Send departures to module
 
                 } else {
                     console.log("Something went wrong: " + resp.StatusCode + ': '+ resp.Message);
