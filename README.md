@@ -70,4 +70,5 @@ The output will look something like this (searching for 'Erikslund'):
 
 ## Screenshoot
 
-__TBD__
+![SL PublicTransport Module](https://github.com/boghammar/MMM-SL-PublicTransport/blob/master/docs/ScreenShot1.png)
+
