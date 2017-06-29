@@ -69,10 +69,12 @@ module.exports = NodeHelper.create({
 
                 } else {
                     console.log("Something went wrong: " + resp.StatusCode + ': '+ resp.Message);
+                    self.sendSocketNotification('SERVICE_FAILURE', resp); 
                 }
             })
             .catch(function(err) {
                 console.log('Problems: '+err);
+                self.sendSocketNotification('SERVICE_FAILURE', {resp: {StatusCode: 600, Message: err}}); 
             });
     },
 

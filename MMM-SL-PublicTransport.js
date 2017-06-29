@@ -36,7 +36,8 @@ Module.register("MMM-SL-PublicTransport", {
     // --------------------------------------- Define required scripts
     getScripts: function() {
 		return [
-			this.file('timehandler.js')
+			//this.file('timehandler.js')
+            'moment.js'
         ];
 	},
     // --------------------------------------- Define required stylesheets
@@ -47,14 +48,16 @@ Module.register("MMM-SL-PublicTransport", {
     // --------------------------------------- Get header
     getHeader: function() {
         return this.data.header + " " + this.config.stationname + " " 
-        + (this.loaded ? this.TimeHandler.getTime(this.currentDepartures.LatestUpdate) : "");
+        + (this.loaded ? '(' + moment(this.currentDepartures.LatestUpdate).format('HH:mm') + ')' : "");
     },
     
     // --------------------------------------- Start the module
     start: function() {
         Log.info("Starting module: " + this.name);
-
-        this.TimeHandler = new TimeHandler();
+        
+        // Set locale.
+		moment.locale(config.language);
+        
         this.loaded = false;
         this.sendSocketNotification('CONFIG', this.config); // Send config to helper and initiate an update
         
@@ -113,8 +116,15 @@ Module.register("MMM-SL-PublicTransport", {
             table.appendChild(row);
             this.setFade(row, ix, this.currentDepartures.departures.length, this.config.fade, this.config.fadePoint);
         }
-
         wrapper.appendChild(table);
+
+        // ----- Show service failure if any
+        if (this.failure !== undefined) {
+            var div = document.createElement("div");
+            div.innerHTML = "Service: "+this.failure.StatusCode + '-' + this.failure.Message;
+            wrapper.appendChild(div);
+        }
+
         return wrapper;
     },
 
@@ -136,9 +146,15 @@ Module.register("MMM-SL-PublicTransport", {
     socketNotificationReceived: function(notification, payload) {
         if (notification === "DEPARTURES") {
             this.loaded = true;
-            // TODO handle payload
+            this.failure = undefined;
+            // Handle payload
             this.currentDepartures = payload;
             Log.info("Departures updated: "+ this.currentDepartures.departures.length);
+            this.updateDom(this.config.animationSpeed);
+        }
+        if (notification == "SERVICE_FAILURE") {
+            this.failure = payload;
+            Log.info("Service failure: "+ this.failure.StatusCode + ':' + this.failure.Message);
             this.updateDom(this.config.animationSpeed);
         }
     }
