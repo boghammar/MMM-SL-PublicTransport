@@ -81,7 +81,7 @@ Module.register("MMM-SL-PublicTransport", {
 			wrapper.className = "dimmed light small";
 			return wrapper;
 		}
-        // TODO fill it!
+        // ------- Create departure table
         var table = document.createElement("table");
         table.className = "small";
 
@@ -109,9 +109,7 @@ Module.register("MMM-SL-PublicTransport", {
             td.innerHTML = dep.Destination;
             td.className = 'align-left'; 
             row.appendChild(td);
-            td = document.createElement("td");
-            td.innerHTML = moment(dep.TimeTabledDateTime).fromNow(); //this.TimeHandler.TimeLeft(dep.TimeTabledDateTime);//dep.DisplayTime; // TODO - fix time according to now
-            td.className = "align-right bright";
+            td = this.getDepartureTime(dep.TimeTabledDateTime, dep.ExpectedDateTime);
             row.appendChild(td);
             table.appendChild(row);
             this.setFade(row, ix, this.currentDepartures.departures.length, this.config.fade, this.config.fadePoint);
@@ -122,6 +120,7 @@ Module.register("MMM-SL-PublicTransport", {
         if (this.failure !== undefined) {
             var div = document.createElement("div");
             div.innerHTML = "Service: "+this.failure.StatusCode + '-' + this.failure.Message;
+            div.style.color = "red"; // TODO Change this to a custom style
             wrapper.appendChild(div);
         }
 
@@ -130,7 +129,7 @@ Module.register("MMM-SL-PublicTransport", {
 
     // --------------------------------------- Calculate departure time
     // Returns a HTML element that shall be added to the current row
-    setFade: function(tableTime, expectedTime) {
+    getDepartureTime: function(tableTime, expectedTime) {
         var td = document.createElement("td");
         if (tableTime == expectedTime) { // There's no delay
             td.innerHTML = moment(tableTime).fromNow();
