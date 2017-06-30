@@ -110,7 +110,7 @@ Module.register("MMM-SL-PublicTransport", {
             td.className = 'align-left'; 
             row.appendChild(td);
             td = document.createElement("td");
-            td.innerHTML = this.TimeHandler.TimeLeft(dep.TimeTabledDateTime);//dep.DisplayTime; // TODO - fix time according to now
+            td.innerHTML = moment(dep.TimeTabledDateTime).fromNow(); //this.TimeHandler.TimeLeft(dep.TimeTabledDateTime);//dep.DisplayTime; // TODO - fix time according to now
             td.className = "align-right bright";
             row.appendChild(td);
             table.appendChild(row);
@@ -126,6 +126,23 @@ Module.register("MMM-SL-PublicTransport", {
         }
 
         return wrapper;
+    },
+
+    // --------------------------------------- Calculate departure time
+    // Returns a HTML element that shall be added to the current row
+    setFade: function(tableTime, expectedTime) {
+        var td = document.createElement("td");
+        if (tableTime == expectedTime) { // There's no delay
+            td.innerHTML = moment(tableTime).fromNow();
+        } else {
+            td.innerHTML = moment(expectedTime).fromNow();
+            var sp = document.createElement("span");
+            sp.innerHTML = moment(tableTime).fromNow();
+            sp.style.textDecoration = "line-through" // TODO Change this to a custom style
+            rd.appendChild(sp);
+        }
+        td.className = "align-right bright";
+        return td;
     },
 
     // --------------------------------------- Handle table fading
