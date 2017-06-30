@@ -138,7 +138,7 @@ Module.register("MMM-SL-PublicTransport", {
             var sp = document.createElement("span");
             sp.innerHTML = moment(tableTime).fromNow();
             sp.style.textDecoration = "line-through" // TODO Change this to a custom style
-            rd.appendChild(sp);
+            td.appendChild(sp);
         }
         td.className = "align-right bright";
         return td;
