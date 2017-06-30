@@ -28,7 +28,6 @@ Module.register("MMM-SL-PublicTransport", {
         direction: '',
         lines: [],
         showdisturbances: false,
-        animationSpeed: 0,
         fade: true,
         fadePoint: 0.2,
     },
@@ -64,7 +63,7 @@ Module.register("MMM-SL-PublicTransport", {
         // Start timer for ui-updates
         var self = this;
         this.uitimer = setInterval(function() { // This timer is saved in uitimer so that we can cancel it
-            self.updateDom(self.config.animationSpeed);
+            self.updateDom();
         }, self.config.uiUpdateInterval);
     },
 
@@ -72,7 +71,7 @@ Module.register("MMM-SL-PublicTransport", {
     getDom: function() {
         var wrapper = document.createElement("div");
         if (this.config.apikey === "" || this.config.apikey === 'PleaseProvideYourOwn') {
-			wrapper.innerHTML = "Please set API key: " + this.name + ".";
+			wrapper.innerHTML = this.name +": Please set API key in config.js.";
 			wrapper.className = "dimmed light small";
 			return wrapper;
 		} 
@@ -166,12 +165,12 @@ Module.register("MMM-SL-PublicTransport", {
             // Handle payload
             this.currentDepartures = payload;
             Log.info("Departures updated: "+ this.currentDepartures.departures.length);
-            this.updateDom(this.config.animationSpeed);
+            this.updateDom();
         }
         if (notification == "SERVICE_FAILURE") {
             this.failure = payload;
             Log.info("Service failure: "+ this.failure.StatusCode + ':' + this.failure.Message);
-            this.updateDom(this.config.animationSpeed);
+            this.updateDom();
         }
     }
 })

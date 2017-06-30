@@ -25,9 +25,9 @@ modules: [
             stationid: 'your-station-id',   // REQUIRED. You need to run the utility findStation to get this
             stationname: 'name',            // This is the name of the station. It's shown in the header
             direction: 1,                   // Optional, if set only show departures in that direction. Not implemented yet
+            displaycount: 100,              // Optional, show this number of departures. Not implemented yet
             lines: [],                      // Optional, only show the lines listed in the array. Not implemented yet
             showdisturbances: false,        // Not implemented yet
-            animationSpeed: 0,
             fade: true,
             fadePoint: 0.2,
         }
