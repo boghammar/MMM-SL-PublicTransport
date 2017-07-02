@@ -9,8 +9,8 @@ You need to obtain your own API key's from TrafikLab for the following API's
 
 ## Install
 1. Clone repository into ``../modules/`` inside your MagicMirror folder.
-2. Run ``npm install`` inside ``../modules/MMM-HH-LocalTransport/`` folder
-3. Run ``node findStation.js apiKey apiUser stationName`` to find out your Station ID.
+2. Run ``npm install`` inside ``../modules/MMM-SL-PublicTransport/`` folder
+3. Run ``node findStation.js apiKey stationName`` to find out your Station ID.
 4. Add the module to the MagicMirror config
 
 ## Configuration
@@ -19,11 +19,12 @@ modules: [
     ...
     {
         module: 'MMM-SL-PublicTransport',
-        position: 'top-right'
+        position: 'top-right',
+        header: 'Busses',
         config: {
             apikey: 'your-api-key',         // REQUIRED.
             stationid: 'your-station-id',   // REQUIRED. You need to run the utility findStation to get this
-            stationname: 'name',            // This is the name of the station. It's shown in the header
+            stationname: 'name',            // This is the name of the station. It's shown in the header if you have set a header on the module
             direction: 1,                   // Optional, if set only show departures in that direction. Not implemented yet
             displaycount: 100,              // Optional, show this number of departures. Not implemented yet
             lines: [],                      // Optional, only show the lines listed in the array. Not implemented yet
@@ -43,7 +44,7 @@ You need to set a stationid in the configuration and to find that run the follow
 
 where ``apikey`` is your API key for the SL Platsuppslag API and ``searchstring`` is the name of the station.
 
-The output will look something like this (searching for 'Erikslund'):
+The output will look something like this (searching for 'Erikslund'). Use the SiteId value as the stationid:
 
 ```
 {
