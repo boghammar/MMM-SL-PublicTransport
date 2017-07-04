@@ -82,7 +82,7 @@ Module.register("MMM-SL-PublicTransport", {
 		}
         // ------- Create departure table
         var table = document.createElement("table");
-        table.className = "small";
+        table.className = "xsmall";
 
         // ------ Table header
         var row = document.createElement("tr");
@@ -100,18 +100,22 @@ Module.register("MMM-SL-PublicTransport", {
         // ------ Fill in departures
         for (var ix = 0; ix < this.currentDepartures.departures.length; ix++) {
             var dep = this.currentDepartures.departures[ix];
-            var row = document.createElement("tr");
-            var td = document.createElement("td");
-            td.innerHTML = dep.LineNumber;
-            row.appendChild(td);
-            td = document.createElement("td");
-            td.innerHTML = dep.Destination;
-            td.className = 'align-left'; 
-            row.appendChild(td);
-            td = this.getDepartureTime(dep.TimeTabledDateTime, dep.ExpectedDateTime);
-            row.appendChild(td);
-            table.appendChild(row);
-            this.setFade(row, ix, this.currentDepartures.departures.length, this.config.fade, this.config.fadePoint);
+            if (this.isWantedLine(dep.LineNumber)) {
+                if (this.isWantedDirection(dep.JourneyDirection)) {
+                    var row = document.createElement("tr");
+                    var td = document.createElement("td");
+                    td.innerHTML = dep.LineNumber;
+                    row.appendChild(td);
+                    td = document.createElement("td");
+                    td.innerHTML = dep.Destination;
+                    td.className = 'align-left'; 
+                    row.appendChild(td);
+                    td = this.getDepartureTime(dep.TimeTabledDateTime, dep.ExpectedDateTime);
+                    row.appendChild(td);
+                    table.appendChild(row);
+                    this.setFade(row, ix, this.currentDepartures.departures.length, this.config.fade, this.config.fadePoint);
+                }
+            }
         }
         wrapper.appendChild(table);
 
@@ -131,16 +135,52 @@ Module.register("MMM-SL-PublicTransport", {
     getDepartureTime: function(tableTime, expectedTime) {
         var td = document.createElement("td");
         if (tableTime == expectedTime) { // There's no delay
-            td.innerHTML = moment(tableTime).fromNow();
+            td.innerHTML = this.timeRemaining(moment(tableTime));
         } else {
-            td.innerHTML = moment(expectedTime).fromNow();
+            td.innerHTML = this.timeRemaining(moment(expectedTime))+ ' ';
             var sp = document.createElement("span");
-            sp.innerHTML = moment(tableTime).fromNow();
+            sp.innerHTML = this.timeRemaining(moment(tableTime));
             sp.style.textDecoration = "line-through" // TODO Change this to a custom style
             td.appendChild(sp);
         }
         td.className = "align-right bright";
         return td;
+    },
+
+    // --------------------------------------- Get a human readable duration 
+    // Dont like the moment.js humanize stuff, too lonmg in swedish and too crud.
+    timeRemaining: function(tt) {
+        var now = moment();
+        var dur = tt.diff(now, 'seconds');
+
+        if (dur < 0) return 'left';
+        if (dur < 30) return 'now';
+        if (30 <= dur && dur < 60) return 'in 1 min';
+        if (60 <= dur && dur < 15*60) return 'in '+Math.round(dur/60)+' min';
+
+        return 'at ' + tt.format('HH:mm');
+    },
+
+    // --------------------------------------- Are we asking for this direction
+    isWantedLine: function(line) {
+        if (this.config.lines !== undefined) {
+            if (this.config.lines.length > 0) {
+                for (var ix = 0; ix < this.config.lines.length; ix++) {
+                    if (line == this.config.lines[ix]) return true;
+                }
+            } else return true;
+        } else return true;
+        return false;
+    },
+
+    // --------------------------------------- Are we asking for this direction
+    isWantedDirection: function(dir) {
+        if (this.config.direction !== undefined) {
+            if (this.config.direction.length > 0) {
+                return dir == this.config.direction;
+            }
+        }
+        return false;
     },
 
     // --------------------------------------- Handle table fading
