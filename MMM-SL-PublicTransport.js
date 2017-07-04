@@ -180,7 +180,7 @@ Module.register("MMM-SL-PublicTransport", {
                 return dir == this.config.direction;
             }
         }
-        return false;
+        return true;
     },
 
     // --------------------------------------- Handle table fading
