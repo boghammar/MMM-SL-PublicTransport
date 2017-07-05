@@ -87,10 +87,12 @@ Module.register("MMM-SL-PublicTransport", {
         // ------ Table header
         var row = document.createElement("tr");
         var th = document.createElement("th");
-        th.innerHTML = "Line"
+        th.innerHTML = "Line&nbsp;"
+        th.className = 'align-left'; 
         row.appendChild(th);
         th = document.createElement("th");
         th.innerHTML = "Destination"
+        th.className = 'align-left'; 
         row.appendChild(th);
         th = document.createElement("th");
         th.innerHTML = "Departure"
@@ -98,12 +100,25 @@ Module.register("MMM-SL-PublicTransport", {
         table.appendChild(row);
 
         // ------ Fill in departures
+        this.cdir = -1;
         for (var ix = 0; ix < this.currentDepartures.departures.length; ix++) {
             var dep = this.currentDepartures.departures[ix];
             if (this.isWantedLine(dep.LineNumber)) {
                 if (this.isWantedDirection(dep.JourneyDirection)) {
+                    if (this.cdir != -1 && this.cdir != dep.JourneyDirection) {
+                        this.cdir = dep.JourneyDirection;
+                        var row = document.createElement("tr");
+                        row.className = 'sup';
+                        var td = document.createElement("td");
+                        td.colSpan = 3;
+                        td.innerHTML = '&nbsp;';
+                        row.appendChild(td);
+                        table.appendChild(row);
+                    }
+                    if (this.cdir == -1) this.cdir = dep.JourneyDirection;
                     var row = document.createElement("tr");
                     var td = document.createElement("td");
+                    td.className = 'align-left'; 
                     td.innerHTML = dep.LineNumber;
                     row.appendChild(td);
                     td = document.createElement("td");
@@ -139,7 +154,7 @@ Module.register("MMM-SL-PublicTransport", {
         } else {
             td.innerHTML = this.timeRemaining(moment(expectedTime))+ ' ';
             var sp = document.createElement("span");
-            sp.innerHTML = this.timeRemaining(moment(tableTime));
+            sp.innerHTML = this.timeRemaining(moment(tableTime), true);
             sp.style.textDecoration = "line-through" // TODO Change this to a custom style
             td.appendChild(sp);
         }
@@ -149,16 +164,16 @@ Module.register("MMM-SL-PublicTransport", {
 
     // --------------------------------------- Get a human readable duration 
     // Dont like the moment.js humanize stuff, too lonmg in swedish and too crud.
-    timeRemaining: function(tt) {
+    timeRemaining: function(tt, noPrefix) {
         var now = moment();
         var dur = tt.diff(now, 'seconds');
 
         if (dur < 0) return 'left';
         if (dur < 30) return 'now';
-        if (30 <= dur && dur < 60) return 'in 1 min';
-        if (60 <= dur && dur < 15*60) return 'in '+Math.round(dur/60)+' min';
+        if (30 <= dur && dur < 60) return (noPrefix ? '': 'in ') +' 1 min';
+        if (60 <= dur && dur < 15*60) return (noPrefix ? '': 'in ') + Math.round(dur/60)+' min';
 
-        return 'at ' + tt.format('HH:mm');
+        return (noPrefix ? '': 'at ') + tt.format('HH:mm');
     },
 
     // --------------------------------------- Are we asking for this direction
