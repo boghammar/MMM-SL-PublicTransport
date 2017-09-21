@@ -24,13 +24,18 @@ modules: [
         config: {
             apikey: 'your-api-key',         // REQUIRED.
             stationid: 'your-station-id',   // REQUIRED. You need to run the utility findStation to get this
-            stationname: 'name',            // This is the name of the station. It's shown in the header if you have set a header on the module
-            direction: 1,                   // Optional, if set only show departures in that direction. Not implemented yet
-            displaycount: 100,              // Optional, show this number of departures. Not implemented yet
-            lines: [],                      // Optional, only show the lines listed in the array. Not implemented yet
+            stationname: 'name',            // This is the name of the station. 
+                                            // It's shown in the header if you have set a header on the module
+            direction: 1,                   // Optional, if set only show departures in that direction.
+                                            // Direction is either 1 or 2, test to see which one you need.
+            displaycount: 10,               // Optional, show this number of departures for each direction.
+            lines: [],                      // Optional, only show the lines listed in the array.
             showdisturbances: false,        // Not implemented yet
-            fade: true,
-            fadePoint: 0.2,
+            fade: true,                     // Shall the table of departures be faded or not
+            fadePoint: 0.2,                 // Fraction from end where to start fading
+            updateInterval: 5*60*100,       // Number of milliseconds between calls to Trafiklab's API
+                                            // There are limitations on number of calls per minute and month
+            uiUpdateInterval: 1000,         // Number of milliseconds between updates of the departure list 
         }
     },
     ...

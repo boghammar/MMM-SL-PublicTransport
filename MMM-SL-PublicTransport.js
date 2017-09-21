@@ -30,6 +30,7 @@ Module.register("MMM-SL-PublicTransport", {
         showdisturbances: false,
         fade: true,
         fadePoint: 0.2,
+        displaycount: 10,
     },
 
     // --------------------------------------- Define required scripts
@@ -101,11 +102,13 @@ Module.register("MMM-SL-PublicTransport", {
 
         // ------ Fill in departures
         this.cdir = -1;
+        var displayCount = 0;
         for (var ix = 0; ix < this.currentDepartures.departures.length; ix++) {
             var dep = this.currentDepartures.departures[ix];
             if (this.isWantedLine(dep.LineNumber)) {
                 if (this.isWantedDirection(dep.JourneyDirection)) {
-                    if (this.cdir != -1 && this.cdir != dep.JourneyDirection) {
+                    if (this.cdir != -1 && this.cdir != dep.JourneyDirection) { 
+                        // We are changing direction, create an empty row to separate the two directions
                         this.cdir = dep.JourneyDirection;
                         var row = document.createElement("tr");
                         row.className = 'sup';
@@ -114,21 +117,25 @@ Module.register("MMM-SL-PublicTransport", {
                         td.innerHTML = '&nbsp;';
                         row.appendChild(td);
                         table.appendChild(row);
+                        displayCount = 0; // Restart count of number of items to display for this new direction
                     }
-                    if (this.cdir == -1) this.cdir = dep.JourneyDirection;
-                    var row = document.createElement("tr");
-                    var td = document.createElement("td");
-                    td.className = 'align-left'; 
-                    td.innerHTML = dep.LineNumber;
-                    row.appendChild(td);
-                    td = document.createElement("td");
-                    td.innerHTML = dep.Destination;
-                    td.className = 'align-left'; 
-                    row.appendChild(td);
-                    td = this.getDepartureTime(dep.TimeTabledDateTime, dep.ExpectedDateTime);
-                    row.appendChild(td);
-                    table.appendChild(row);
-                    this.setFade(row, ix, this.currentDepartures.departures.length, this.config.fade, this.config.fadePoint);
+                    displayCount++;
+                    if (displayCount <= this.config.displaycount) { // Only show displaycount entries
+                        if (this.cdir == -1) this.cdir = dep.JourneyDirection;
+                        var row = document.createElement("tr");
+                        var td = document.createElement("td");
+                        td.className = 'align-left'; 
+                        td.innerHTML = dep.LineNumber;
+                        row.appendChild(td);
+                        td = document.createElement("td");
+                        td.innerHTML = dep.Destination;
+                        td.className = 'align-left'; 
+                        row.appendChild(td);
+                        td = this.getDepartureTime(dep.TimeTabledDateTime, dep.ExpectedDateTime);
+                        row.appendChild(td);
+                        table.appendChild(row);
+                        this.setFade(row, ix, this.currentDepartures.departures.length, this.config.fade, this.config.fadePoint);
+                    }
                 }
             }
         }
@@ -183,17 +190,15 @@ Module.register("MMM-SL-PublicTransport", {
                 for (var ix = 0; ix < this.config.lines.length; ix++) {
                     if (line == this.config.lines[ix]) return true;
                 }
-            } else return true;
-        } else return true;
+            } else return true; // Its defined but does not contain anything = we want all lines
+        } else return true; // Its undefined = we want all lines
         return false;
     },
 
     // --------------------------------------- Are we asking for this direction
     isWantedDirection: function(dir) {
-        if (this.config.direction !== undefined) {
-            if (this.config.direction.length > 0) {
-                return dir == this.config.direction;
-            }
+        if (this.config.direction !== undefined && this.config.direction != '') {
+            return dir == this.config.direction;
         }
         return true;
     },
