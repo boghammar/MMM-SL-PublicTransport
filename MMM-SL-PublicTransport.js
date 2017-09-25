@@ -134,7 +134,7 @@ Module.register("MMM-SL-PublicTransport", {
                         td = this.getDepartureTime(dep.TimeTabledDateTime, dep.ExpectedDateTime);
                         row.appendChild(td);
                         table.appendChild(row);
-                        this.setFade(row, ix, this.currentDepartures.departures.length, this.config.fade, this.config.fadePoint);
+                        this.setFade(row, /*ix*/displayCount, this.currentDepartures.departures.length, this.config.fade, this.config.fadePoint);
                     }
                 }
             }
@@ -146,6 +146,7 @@ Module.register("MMM-SL-PublicTransport", {
             var div = document.createElement("div");
             div.innerHTML = "Service: "+this.failure.StatusCode + '-' + this.failure.Message;
             div.style.color = "red"; // TODO Change this to a custom style
+            div.className = "xsmall";
             wrapper.appendChild(div);
         }
 

@@ -60,10 +60,29 @@ module.exports = NodeHelper.create({
                     self.addDepartures(resp.ResponseData.Trains);
                     self.addDepartures(resp.ResponseData.Trams);
                     self.addDepartures(resp.ResponseData.Ships);
-                    // Sort on direction
-                    self.departures.sort(dynamicSort('-JourneyDirection'));
+                    //console.log(self.departures);
+
+                    // Sort on ExpectedDateTime
+                    for (var ix=0; ix < self.departures.length; ix++) {
+                        if (self.departures[ix] !== undefined) {
+                            self.departures[ix].sort(dynamicSort('ExpectedDateTime'))
+                        }
+                    }
+                    //console.log(self.departures);
+
+                    // Add the sorted arrays into one array
+                    var temp = []
+                    for (var ix=0; ix < self.departures.length; ix++) {
+                        if (self.departures[ix] !== undefined) {
+                            for (var iy=0; iy < self.departures[ix].length; iy++) {
+                                temp.push(self.departures[ix][iy]);
+                            }
+                        }
+                    }
+                    //console.log(temp);
+                    
                     // TODO:Handle resp.ResponseData.StopPointDeviations
-                    CurrentDepartures.departures = self.departures;
+                    CurrentDepartures.departures = temp; //self.departures;
                     console.log((new Date(Date.now())).toLocaleTimeString() + ": Sending DEPARTURES "+CurrentDepartures.departures.length);
                     self.sendSocketNotification('DEPARTURES', CurrentDepartures); // Send departures to module
 
@@ -83,7 +102,10 @@ module.exports = NodeHelper.create({
         for (var ix =0; ix < depArray.length; ix++) {
             var element = depArray[ix];
             var dep = new Departure(element);
-            this.departures.push(dep);
+            if (this.departures[dep.JourneyDirection] === undefined) {
+                this.departures[dep.JourneyDirection] = [];
+            }
+            this.departures[dep.JourneyDirection].push(dep);
         }
     },
 
