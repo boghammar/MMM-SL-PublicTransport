@@ -29,7 +29,9 @@ modules: [
             direction: 1,                   // Optional, if set only show departures in that direction.
                                             // Direction is either 1 or 2, test to see which one you need.
             displaycount: 10,               // Optional, show this number of departures for each direction.
-            lines: [],                      // Optional, only show the lines listed in the array.
+            lines: [],                      // Optional, only show the lines listed in the array. This can be a simple array of strings
+                                            // like ['611', '312', '629'] or a combination of objects with linename and direction
+                                            // like [['611', 1], '312', ['629', 2]] see the description on "in to town" functionality below.  
             showdisturbances: false,        // Not implemented yet
             fade: true,                     // Shall the table of departures be faded or not
             fadePoint: 0.2,                 // Fraction from end where to start fading
@@ -41,6 +43,24 @@ modules: [
     ...
 ]
 ```
+## In to town
+__Not implemented yet__
+
+If you only want to see the departures "in to town" and your station has several lines that have different directions "in to town" you can configure the module like this
+```
+    ...
+    lines: [['611', 1], '312', ['629',2]],
+    direction: 1,
+    ...
+```
+This will show line 611 in direction 1 intermixed with line 629 in direction 2 intermixed with line 312 in direction 1 like this
+```
+Line Destination Departure
+611  Town        in 1 min
+629  Town        in 2 min
+611  Town        in 11 min
+312  Somewhere   in 12 min 
+```
 
 ## Find stationid
 You need to set a stationid in the configuration and to find that run the following helper
@@ -48,6 +68,8 @@ You need to set a stationid in the configuration and to find that run the follow
 ```node findStation.js apikey searchstring```
 
 where ``apikey`` is your API key for the SL Platsuppslag API and ``searchstring`` is the name of the station.
+
+__NOTE__: This API key is not the same as the API key for SL Realtidinformation 4 API that you hace to enter in the module configuration.
 
 The output will look something like this (searching for 'Erikslund'). Use the SiteId value as the stationid:
 
