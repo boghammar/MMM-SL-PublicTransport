@@ -134,7 +134,7 @@ Module.register("MMM-SL-PublicTransport", {
                         td = this.getDepartureTime(dep.TimeTabledDateTime, dep.ExpectedDateTime);
                         row.appendChild(td);
                         table.appendChild(row);
-                        this.setFade(row, /*ix*/displayCount, this.currentDepartures.departures.length, this.config.fade, this.config.fadePoint);
+                        this.setFade(row, /*ix*/displayCount, /*this.currentDepartures.departures.length*/this.config.displaycount , this.config.fade, this.config.fadePoint);
                     }
                 }
             }
