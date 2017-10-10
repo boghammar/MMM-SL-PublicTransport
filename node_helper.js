@@ -102,11 +102,25 @@ module.exports = NodeHelper.create({
         for (var ix =0; ix < depArray.length; ix++) {
             var element = depArray[ix];
             var dep = new Departure(element);
-            if (this.departures[dep.JourneyDirection] === undefined) {
-                this.departures[dep.JourneyDirection] = [];
+            if (this.isWantedLine(dep.LineNumber)) {
+                if (this.departures[dep.JourneyDirection] === undefined) {
+                    this.departures[dep.JourneyDirection] = [];
+                }
+                this.departures[dep.JourneyDirection].push(dep);
             }
-            this.departures[dep.JourneyDirection].push(dep);
         }
+    },
+
+    // --------------------------------------- Are we asking for this direction
+    isWantedLine: function(line) {
+        if (this.config.lines !== undefined) {
+            if (this.config.lines.length > 0) {
+                for (var ix = 0; ix < this.config.lines.length; ix++) {
+                    if (line == this.config.lines[ix]) return true;
+                }
+            } else return true; // Its defined but does not contain anything = we want all lines
+        } else return true; // Its undefined = we want all lines
+        return false;
     },
 
     // --------------------------------------- Handle notifocations
