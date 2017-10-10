@@ -47,7 +47,6 @@ modules: [
 ]
 ```
 ## In to town
-__Not implemented yet__
 
 If you only want to see the departures "in to town" and your station has several lines that have different directions "in to town" you can configure the module like this
 ```
@@ -64,7 +63,7 @@ Line Destination Departure
 611  Town        in 11 min
 312  Somewhere   in 12 min 
 ```
-The feature changes internally the direction number for the lines that are represented as ['line#', dir] so that dir for that line will get the value of direction.
+The feature has some limitations. It changes internally the direction number for the lines that are represented as ['line#', dir] so that dir for that line will get the value of direction. It will only show departures that go in 'direction' or in the direction described by the ['line#', dir] format. Hence there will only be one list.
 
 ## Find stationid
 You need to set a stationid in the configuration and to find that run the following helper
