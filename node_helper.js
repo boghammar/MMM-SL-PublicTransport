@@ -116,7 +116,12 @@ module.exports = NodeHelper.create({
         if (this.config.lines !== undefined) {
             if (this.config.lines.length > 0) {
                 for (var ix = 0; ix < this.config.lines.length; ix++) {
-                    if (line == this.config.lines[ix]) return true;
+                    // Handle objects in lines
+                    var ll = this.config.lines[ix];
+                    if (ll !== null && typeof ll === 'array') {
+                        ll = ll[0];
+                    }
+                    if (line == ll) return true;
                 }
             } else return true; // Its defined but does not contain anything = we want all lines
         } else return true; // Its undefined = we want all lines
