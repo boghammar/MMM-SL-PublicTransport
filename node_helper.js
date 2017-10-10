@@ -103,6 +103,7 @@ module.exports = NodeHelper.create({
             var element = depArray[ix];
             var dep = new Departure(element);
             if (this.isWantedLine(dep.LineNumber)) {
+                this.fixJourneyDirection(dep);
                 if (this.departures[dep.JourneyDirection] === undefined) {
                     this.departures[dep.JourneyDirection] = [];
                 }
@@ -110,24 +111,45 @@ module.exports = NodeHelper.create({
             }
         }
     },
-
+    
+    // --------------------------------------- If we want to change direction number on a line
+    fixJourneyDirection: function(dep) {
+        if (this.config.lines !== undefined && this.config.direction !== undefined) {
+            if (this.config.lines.length > 0) {
+                for (var ix = 0; ix < this.config.lines.length; ix++) {
+                    if (dep.LineNumber == this.getLineNumber(ix)) {
+                        // the line is mentioned in config lines, handle it
+                        if (this.config.lines[ix] !== null && typeof this.config.lines[ix] === 'array') {
+                            dep.JourneyDirection = this.config.direction;
+                        }
+                    }
+                }
+            }
+        } 
+    },
+    
     // --------------------------------------- Are we asking for this direction
     isWantedLine: function(line) {
         if (this.config.lines !== undefined) {
             if (this.config.lines.length > 0) {
                 for (var ix = 0; ix < this.config.lines.length; ix++) {
                     // Handle objects in lines
-                    var ll = this.config.lines[ix];
-                    if (ll !== null && typeof ll === 'array') {
-                        ll = ll[0];
-                    }
-                    if (line == ll) return true;
+                    if (line == this.getLineNumber(ix)) return true;
                 }
             } else return true; // Its defined but does not contain anything = we want all lines
         } else return true; // Its undefined = we want all lines
         return false;
     },
-
+    
+    // --------------------------------------- Get the line number of a lines entry
+    getLineNumber: function(ix) {
+        var ll = this.config.lines[ix];
+        if (ll !== null && typeof ll === 'array') {
+            ll = ll[0];
+        }
+        return ll;
+    },
+    
     // --------------------------------------- Handle notifocations
     socketNotificationReceived: function(notification, payload) {
         const self = this;
