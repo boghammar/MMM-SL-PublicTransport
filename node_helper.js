@@ -102,8 +102,11 @@ module.exports = NodeHelper.create({
         for (var ix =0; ix < depArray.length; ix++) {
             var element = depArray[ix];
             var dep = new Departure(element);
+            console.log("BLine: "+ dep.LineNumber);
+            dep = this.fixJourneyDirection(dep);
             if (this.isWantedLine(dep.LineNumber)) {
-                this.fixJourneyDirection(dep);
+                console.log("BLine: "+ dep.LineNumber + " Dir:" + dep.JourneyDirection + " Dst:" + dep.Destination);
+                console.log("ALine: "+ dep.LineNumber + " Dir:" + dep.JourneyDirection + " Dst:" + dep.Destination);
                 if (this.departures[dep.JourneyDirection] === undefined) {
                     this.departures[dep.JourneyDirection] = [];
                 }
@@ -119,13 +122,20 @@ module.exports = NodeHelper.create({
                 for (var ix = 0; ix < this.config.lines.length; ix++) {
                     if (dep.LineNumber == this.getLineNumber(ix)) {
                         // the line is mentioned in config lines, handle it
-                        if (this.config.lines[ix] !== null && typeof this.config.lines[ix] === 'array') {
-                            dep.JourneyDirection = this.config.direction;
+                        if (Array.isArray(this.config.lines[ix])) { //this.config.lines[ix]} !== null && typeof this.config.lines[ix] === 'array') {
+                            if (dep.JourneyDirection == this.config.lines[ix][1]) {
+                                console.log("Changing Line: "+ dep.LineNumber + " Dir:" + dep.JourneyDirection + " to " + this.config.direction);                            
+                                dep.JourneyDirection = this.config.direction;
+                            } else {
+                                console.log("Hiding Line: "+ dep.LineNumber + " Dir:" + dep.JourneyDirection + " to " + this.config.direction);                            
+                                dep.JourneyDirection = 12;
+                            }
                         }
                     }
                 }
             }
-        } 
+        }
+        return dep; 
     },
     
     // --------------------------------------- Are we asking for this direction
@@ -143,10 +153,13 @@ module.exports = NodeHelper.create({
     
     // --------------------------------------- Get the line number of a lines entry
     getLineNumber: function(ix) {
+        var wasarray = false;
         var ll = this.config.lines[ix];
-        if (ll !== null && typeof ll === 'array') {
+        if (Array.isArray(ll)) { //ll !== null && typeof ll === 'array') {
             ll = ll[0];
+            wasarray = true;
         }
+        //console.log("IX: "+ ix + " LL:" + ll + " wasarray " + wasarray);                            
         return ll;
     },
     
