@@ -105,14 +105,24 @@ module.exports = NodeHelper.create({
             console.log("BLine: "+ dep.LineNumber);
             dep = this.fixJourneyDirection(dep);
             if (this.isWantedLine(dep.LineNumber)) {
-                console.log("BLine: "+ dep.LineNumber + " Dir:" + dep.JourneyDirection + " Dst:" + dep.Destination);
-                console.log("ALine: "+ dep.LineNumber + " Dir:" + dep.JourneyDirection + " Dst:" + dep.Destination);
-                if (this.departures[dep.JourneyDirection] === undefined) {
-                    this.departures[dep.JourneyDirection] = [];
+                if (this.isWantedDirection(dep.JourneyDirection)) {
+                    console.log("BLine: "+ dep.LineNumber + " Dir:" + dep.JourneyDirection + " Dst:" + dep.Destination);
+                    console.log("ALine: "+ dep.LineNumber + " Dir:" + dep.JourneyDirection + " Dst:" + dep.Destination);
+                    if (this.departures[dep.JourneyDirection] === undefined) {
+                        this.departures[dep.JourneyDirection] = [];
+                    }
+                    this.departures[dep.JourneyDirection].push(dep);
                 }
-                this.departures[dep.JourneyDirection].push(dep);
             }
         }
+    },
+    
+    // --------------------------------------- Are we asking for this direction
+    isWantedDirection: function(dir) {
+        if (this.config.direction !== undefined && this.config.direction != '') {
+            return dir == this.config.direction;
+        }
+        return true;
     },
     
     // --------------------------------------- If we want to change direction number on a line
@@ -128,7 +138,7 @@ module.exports = NodeHelper.create({
                                 dep.JourneyDirection = this.config.direction;
                             } else {
                                 console.log("Hiding Line: "+ dep.LineNumber + " Dir:" + dep.JourneyDirection + " to " + this.config.direction);                            
-                                dep.JourneyDirection = 12;
+                                dep.JourneyDirection = 12; // Just some arbitrary number assuming a line can only have a direction 1 or 2
                             }
                         }
                     }
@@ -166,7 +176,7 @@ module.exports = NodeHelper.create({
     // --------------------------------------- Handle notifocations
     socketNotificationReceived: function(notification, payload) {
         const self = this;
-        if (notification === 'CONFIG' && this.started == false) {
+        if (notification === 'CONFIG' /*&& this.started == false*/) {
 		    this.config = payload;	     
 		    this.started = true;
 		    self.scheduleUpdate();
