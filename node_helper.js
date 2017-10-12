@@ -13,45 +13,52 @@
  */
 const NodeHelper = require("node_helper");
 const request = require("request-promise");
+var HttpsProxyAgent = require('https-proxy-agent');
+var Url = require('url');
 var Departure = require('./departure.js');
+var debugMe = false;
 
 module.exports = NodeHelper.create({
 
     // --------------------------------------- Start the helper
-    start: function() {
+    start: function () {
         //Log.info('Starting helper: '+ this.name);
-        console.log('Starting helper: '+ this.name);
+        log('Starting helper: ' + this.name);
         this.started = false;
     },
 
     // --------------------------------------- Schedule a departure update
-    scheduleUpdate: function() {
+    scheduleUpdate: function () {
         var self = this;
-        this.updatetimer = setInterval(function() { // This timer is saved in uitimer so that we can cancel it
+        this.updatetimer = setInterval(function () { // This timer is saved in uitimer so that we can cancel it
             self.getDepartures();
         }, self.config.updateInterval);
     },
 
     // --------------------------------------- Retrive departure info
-    getDepartures: function() {
+    getDepartures: function () {
         var self = this;
 
-        console.log((new Date(Date.now())).toLocaleTimeString() + ': Getting departures for station id ' + this.config.stationid);
+        log('Getting departures for station id ' + this.config.stationid);
         // http://api.sl.se/api2/realtimedeparturesV4.<FORMAT>?key=<DIN API NYCKEL>&siteid=<SITEID>&timewindow=<TIMEWINDOW>
-        // http://api.sl.se/api2/realtimedeparturesV4.json?key=d68264d33b5c4898879971d1f4550539&siteid=2229&timewindow=60
+        var transport = (this.config.SSL ? 'https' : 'http');
         var opt = {
-            uri: 'https://api.sl.se/api2/realtimedeparturesV4.json',
-            qs : {
+            uri: transport + '://api.sl.se/api2/realtimedeparturesV4.json',
+            qs: {
                 key: self.config.apikey,
                 siteid: self.config.stationid,
                 timewindow: 60
             },
             json: true
         };
-        console.log('Calling '+opt.uri);
+        if (this.config.proxy !== undefined) {
+            opt.agent = new HttpsProxyAgent(Url.parse(this.config.proxy));
+            log('SL-PublicTransport: Using proxy ' + this.config.proxy);
+        }
+        log('SL-PublicTransport: Calling ' + opt.uri);
         console.log(opt);
         request(opt)
-            .then(function(resp) {
+            .then(function (resp) {
                 if (resp.StatusCode == 0) {
                     //console.log(resp);
                     var CurrentDepartures = {};
@@ -66,7 +73,7 @@ module.exports = NodeHelper.create({
                     //console.log(self.departures);
 
                     // Sort on ExpectedDateTime
-                    for (var ix=0; ix < self.departures.length; ix++) {
+                    for (var ix = 0; ix < self.departures.length; ix++) {
                         if (self.departures[ix] !== undefined) {
                             self.departures[ix].sort(dynamicSort('ExpectedDateTime'))
                         }
@@ -75,42 +82,42 @@ module.exports = NodeHelper.create({
 
                     // Add the sorted arrays into one array
                     var temp = []
-                    for (var ix=0; ix < self.departures.length; ix++) {
+                    for (var ix = 0; ix < self.departures.length; ix++) {
                         if (self.departures[ix] !== undefined) {
-                            for (var iy=0; iy < self.departures[ix].length; iy++) {
+                            for (var iy = 0; iy < self.departures[ix].length; iy++) {
                                 temp.push(self.departures[ix][iy]);
                             }
                         }
                     }
                     //console.log(temp);
-                    
+
                     // TODO:Handle resp.ResponseData.StopPointDeviations
                     CurrentDepartures.departures = temp; //self.departures;
-                    console.log((new Date(Date.now())).toLocaleTimeString() + ": Sending DEPARTURES "+CurrentDepartures.departures.length);
+                    log("Sending DEPARTURES " + CurrentDepartures.departures.length);
                     self.sendSocketNotification('DEPARTURES', CurrentDepartures); // Send departures to module
 
                 } else {
-                    console.log("Something went wrong: " + resp.StatusCode + ': '+ resp.Message);
-                    self.sendSocketNotification('SERVICE_FAILURE', resp); 
+                    log("Something went wrong: " + resp.StatusCode + ': ' + resp.Message);
+                    self.sendSocketNotification('SERVICE_FAILURE', resp);
                 }
             })
-            .catch(function(err) {
-                console.log('Problems: '+err);
-                self.sendSocketNotification('SERVICE_FAILURE', {resp: {StatusCode: 600, Message: err}}); 
+            .catch(function (err) {
+                log('Problems: ' + err);
+                self.sendSocketNotification('SERVICE_FAILURE', { resp: { StatusCode: 600, Message: err } });
             });
     },
 
     // --------------------------------------- Add departures to our departures array
     addDepartures: function (depArray) {
-        for (var ix =0; ix < depArray.length; ix++) {
+        for (var ix = 0; ix < depArray.length; ix++) {
             var element = depArray[ix];
             var dep = new Departure(element);
-            console.log("BLine: "+ dep.LineNumber);
+            debug("BLine: " + dep.LineNumber);
             dep = this.fixJourneyDirection(dep);
             if (this.isWantedLine(dep.LineNumber)) {
                 if (this.isWantedDirection(dep.JourneyDirection)) {
-                    console.log("BLine: "+ dep.LineNumber + " Dir:" + dep.JourneyDirection + " Dst:" + dep.Destination);
-                    console.log("ALine: "+ dep.LineNumber + " Dir:" + dep.JourneyDirection + " Dst:" + dep.Destination);
+                    debug("BLine: " + dep.LineNumber + " Dir:" + dep.JourneyDirection + " Dst:" + dep.Destination);
+                    debug("ALine: " + dep.LineNumber + " Dir:" + dep.JourneyDirection + " Dst:" + dep.Destination);
                     if (this.departures[dep.JourneyDirection] === undefined) {
                         this.departures[dep.JourneyDirection] = [];
                     }
@@ -119,17 +126,17 @@ module.exports = NodeHelper.create({
             }
         }
     },
-    
+
     // --------------------------------------- Are we asking for this direction
-    isWantedDirection: function(dir) {
+    isWantedDirection: function (dir) {
         if (this.config.direction !== undefined && this.config.direction != '') {
             return dir == this.config.direction;
         }
         return true;
     },
-    
+
     // --------------------------------------- If we want to change direction number on a line
-    fixJourneyDirection: function(dep) {
+    fixJourneyDirection: function (dep) {
         if (this.config.lines !== undefined && this.config.direction !== undefined) {
             if (this.config.lines.length > 0) {
                 for (var ix = 0; ix < this.config.lines.length; ix++) {
@@ -137,10 +144,10 @@ module.exports = NodeHelper.create({
                         // the line is mentioned in config lines, handle it
                         if (Array.isArray(this.config.lines[ix])) { //this.config.lines[ix]} !== null && typeof this.config.lines[ix] === 'array') {
                             if (dep.JourneyDirection == this.config.lines[ix][1]) {
-                                console.log("Changing Line: "+ dep.LineNumber + " Dir:" + dep.JourneyDirection + " to " + this.config.direction);                            
+                                debug("Changing Line: " + dep.LineNumber + " Dir:" + dep.JourneyDirection + " to " + this.config.direction);
                                 dep.JourneyDirection = this.config.direction;
                             } else {
-                                console.log("Hiding Line: "+ dep.LineNumber + " Dir:" + dep.JourneyDirection + " to " + this.config.direction);                            
+                                debug("Hiding Line: " + dep.LineNumber + " Dir:" + dep.JourneyDirection + " to " + this.config.direction);
                                 dep.JourneyDirection = 12; // Just some arbitrary number assuming a line can only have a direction 1 or 2
                             }
                         }
@@ -148,11 +155,11 @@ module.exports = NodeHelper.create({
                 }
             }
         }
-        return dep; 
+        return dep;
     },
-    
+
     // --------------------------------------- Are we asking for this direction
-    isWantedLine: function(line) {
+    isWantedLine: function (line) {
         if (this.config.lines !== undefined) {
             if (this.config.lines.length > 0) {
                 for (var ix = 0; ix < this.config.lines.length; ix++) {
@@ -163,26 +170,27 @@ module.exports = NodeHelper.create({
         } else return true; // Its undefined = we want all lines
         return false;
     },
-    
+
     // --------------------------------------- Get the line number of a lines entry
-    getLineNumber: function(ix) {
+    getLineNumber: function (ix) {
         var wasarray = false;
         var ll = this.config.lines[ix];
         if (Array.isArray(ll)) { //ll !== null && typeof ll === 'array') {
             ll = ll[0];
             wasarray = true;
         }
-        //console.log("IX: "+ ix + " LL:" + ll + " wasarray " + wasarray);                            
+        //debug("IX: "+ ix + " LL:" + ll + " wasarray " + wasarray);                            
         return ll;
     },
-    
+
     // --------------------------------------- Handle notifocations
-    socketNotificationReceived: function(notification, payload) {
+    socketNotificationReceived: function (notification, payload) {
         const self = this;
         if (notification === 'CONFIG' /*&& this.started == false*/) {
-		    this.config = payload;	     
-		    this.started = true;
-		    self.scheduleUpdate();
+            this.config = payload;
+            this.started = true;
+            debugMe = this.config.debug;
+            self.scheduleUpdate();
             self.getDepartures(); // Get it first time
         };
     }
@@ -193,12 +201,26 @@ module.exports = NodeHelper.create({
 //
 function dynamicSort(property) {
     var sortOrder = 1;
-    if(property[0] === "-") {
+    if (property[0] === "-") {
         sortOrder = -1;
         property = property.substr(1);
     }
-    return function (a,b) {
+    return function (a, b) {
         var result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
         return result * sortOrder;
     }
+}
+
+// --------------------------------------- At beginning of log entries
+ function logStart() {
+    return (new Date(Date.now())).toLocaleTimeString() + " MMM-SL-PublicTransport: ";
+}
+
+// --------------------------------------- Logging
+function log(msg) {
+    console.log(logStart() + msg);
+}
+// --------------------------------------- Debugging
+function debug(msg) {
+    if (debugMe) log(msg);
 }

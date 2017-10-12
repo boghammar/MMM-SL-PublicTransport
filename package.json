@@ -22,7 +22,9 @@
   },
   "homepage": "https://github.com/boghammar/MMM-SL-PublicTransport#readme",
   "dependencies": {
+    "https-proxy-agent": "^2.1.0",
     "request": "^2.81.0",
-    "request-promise": "^4.2.1"
+    "request-promise": "^4.2.1",
+    "url": "^0.11.0"
   }
 }
