@@ -13,6 +13,8 @@
  */
 const NodeHelper = require("node_helper");
 const request = require("request-promise");
+var HttpsProxyAgent = require('https-proxy-agent');
+var Url = require('url');
 var Departure = require('./departure.js');
 
 module.exports = NodeHelper.create({
@@ -46,7 +48,11 @@ module.exports = NodeHelper.create({
             },
             json: true
         };
-        console.log('Calling '+opt.uri);
+        if (this.config.proxy !== undefined) {
+            opt.agent = new HttpsProxyAgent(Url.parse(this.config.proxy));
+            console.log('SL-PublicTransport: Using proxy '+this.config.proxy);        
+        }
+        console.log('SL-PublicTransport: Calling '+opt.uri);
         request(opt)
             .then(function(resp) {
                 if (resp.StatusCode == 0) {
