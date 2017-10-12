@@ -203,6 +203,7 @@ Module.register("MMM-SL-PublicTransport", {
 
     // --------------------------------------- Handle table fading
     setFade: function (row, ix, len, fade, fadePoint) {
+        len = len + 1; // If we dont do this the last line will have opacity 0
         if (fade && fadePoint < 1) {
             if (fadePoint < 0) {
                 fadePoint = 0;
