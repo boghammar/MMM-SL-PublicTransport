@@ -37,6 +37,8 @@ module.exports = NodeHelper.create({
         var self = this;
 
         console.log((new Date(Date.now())).toLocaleTimeString() + ': Getting departures for station id ' + this.config.stationid);
+        // http://api.sl.se/api2/realtimedeparturesV4.<FORMAT>?key=<DIN API NYCKEL>&siteid=<SITEID>&timewindow=<TIMEWINDOW>
+        // http://api.sl.se/api2/realtimedeparturesV4.json?key=d68264d33b5c4898879971d1f4550539&siteid=2229&timewindow=60
         var opt = {
             uri: 'https://api.sl.se/api2/realtimedeparturesV4.json',
             qs : {
@@ -47,6 +49,7 @@ module.exports = NodeHelper.create({
             json: true
         };
         console.log('Calling '+opt.uri);
+        console.log(opt);
         request(opt)
             .then(function(resp) {
                 if (resp.StatusCode == 0) {
