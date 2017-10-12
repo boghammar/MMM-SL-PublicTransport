@@ -41,6 +41,8 @@ modules: [
             updateInterval: 5*60*100,       // Number of milliseconds between calls to Trafiklab's API
                                             // There are limitations on number of calls per minute and month
             uiUpdateInterval: 1000,         // Number of milliseconds between updates of the departure list 
+            SSL: true,                      // Use https to access the TrafikLab services
+            debug: false,                   // Enable some extra output when debugging
         }
     },
     ...

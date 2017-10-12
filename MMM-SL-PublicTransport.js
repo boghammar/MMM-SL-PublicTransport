@@ -31,6 +31,7 @@ Module.register("MMM-SL-PublicTransport", {
         fade: true,
         fadePoint: 0.2,
         displaycount: 10,
+        SSL: true,
     },
 
     // --------------------------------------- Define required scripts
@@ -48,8 +49,13 @@ Module.register("MMM-SL-PublicTransport", {
     // --------------------------------------- Get header
     getHeader: function () {
         if (this.currentDepartures !== undefined) {
-        return this.data.header + " " + this.config.stationname + " "
-            + (this.loaded ? '(' + moment(this.currentDepartures.LatestUpdate).format('HH:mm') + ')' : "");
+            var format = (this.config.debug ? 'HH:mm:ss' : 'HH:mm');
+            return this.data.header + " " + this.config.stationname + " "
+                + (this.loaded ? '(' 
+                    + moment(this.currentDepartures.LatestUpdate).format(format) + ')'
+                    + (this.config.debug ? '/('+moment(this.currentDepartures.obtained).format(format)+')' : '') 
+                    : ""
+                );
         } else {
             return this.data.header + " " + this.config.stationname ;
         }
@@ -146,8 +152,8 @@ Module.register("MMM-SL-PublicTransport", {
         // ----- Show service failure if any
         if (this.failure !== undefined) {
             var div = document.createElement("div");
-            var msg = (this.failure.resp.Message.Message !== undefined ? this.failure.resp.Message : this.failure.resp.Message.Message );
-            div.innerHTML = "Service: " + this.failure.resp.StatusCode + '-' + msg;
+            var msg = (this.failure.resp.Message.Message !== undefined ? this.failure.resp.Message : this.failure.resp.Message.message );
+            div.innerHTML = moment(new Date()).format('HH:mm') +" Service: " + this.failure.resp.StatusCode + '-' + msg;
             div.style.color = "red"; // TODO Change this to a custom style
             div.className = "xsmall";
             wrapper.appendChild(div);
@@ -217,6 +223,7 @@ Module.register("MMM-SL-PublicTransport", {
             // Handle payload
             this.currentDepartures = payload;
             Log.info("Departures updated: " + this.currentDepartures.departures.length);
+            this.currentDepartures.obtained = new Date();
             this.updateDom();
         }
         if (notification == "SERVICE_FAILURE") {
