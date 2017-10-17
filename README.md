@@ -13,6 +13,10 @@ You need to obtain your own API key's from TrafikLab for the following API's
 3. Run ``node findStation.js apiKey stationName`` to find out your Station ID.
 4. Add the module to the MagicMirror config
 
+## Update
+1. Run ``git pull`` inside ``../modules/MMM-SL-PublicTransport/`` folder.
+2. Run ``npm install`` inside ``../modules/MMM-SL-PublicTransport/`` folder
+
 ## Configuration
 ```
 modules: [
