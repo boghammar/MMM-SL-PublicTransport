@@ -31,7 +31,7 @@ Module.register("MMM-SL-PublicTransport", {
         fade: true,
         fadePoint: 0.2,
         displaycount: 10,
-        SSL: true,
+        SSL: false,
     },
 
     // --------------------------------------- Define required scripts
@@ -152,7 +152,9 @@ Module.register("MMM-SL-PublicTransport", {
         // ----- Show service failure if any
         if (this.failure !== undefined) {
             var div = document.createElement("div");
-            var msg = (this.failure.resp.Message.Message !== undefined ? this.failure.resp.Message : this.failure.resp.Message.message );
+            var msg = (this.failure.Message !== undefined ? this.failure.Message 
+                : (this.failure.resp.Message.Message !== undefined ? this.failure.resp.Message 
+                    : this.failure.resp.Message.message ));
             div.innerHTML = moment(new Date()).format('HH:mm') +" Service: " + this.failure.resp.StatusCode + '-' + msg;
             div.style.color = "red"; // TODO Change this to a custom style
             div.className = "xsmall";
