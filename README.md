@@ -23,7 +23,7 @@ modules: [
     ...
     {
         module: 'MMM-SL-PublicTransport',
-        position: 'top-right',
+        position: 'top_right',
         header: 'Busses',
         config: {
             apikey: 'your-api-key',         // REQUIRED.
