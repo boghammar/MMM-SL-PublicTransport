@@ -46,6 +46,8 @@ modules: [
             fadePoint: 0.2,                 // Fraction from end where to start fading
             updateInterval: 5*60*100,       // Number of milliseconds between calls to Trafiklab's API
                                             // There are limitations on number of calls per minute and month
+            highUpdateInterval: {}          // if defined use higher frequences fro updates, see 
+                                            // "Set what times to update more frequently" below
             uiUpdateInterval: 1000,         // Number of milliseconds between updates of the departure list 
             SSL: false,                     // Use https to access the TrafikLab services, defaults to
                                             // false since I have experienced problems accessing this 
@@ -75,6 +77,27 @@ Line Destination Departure
 312  Somewhere   in 12 min 
 ```
 The feature has some limitations. It changes internally the direction number for the lines that are represented as ['line#', dir] so that dir for that line will get the value of direction. It will only show departures that go in 'direction' or in the direction described by the ['line#', dir] format. Hence there will only be one list.
+
+## Set what times to update more frequently
+If you want the module to update departure times more frequently between certain hours use the ``highUpdateInterval`` config parameter.
+
+This parameter is used like this:
+
+```
+    ...
+    highUpdateInterval: {updateInterval: 5*60*1000, 
+        times: [
+            {days: weekdays, start: 07.00, stop: 09:00},
+            {days: weekdays, start: 16.00, stop: 18:00}
+        ]
+    }
+    ...
+```
+where
+* ``updateInterval`` is the frequency to use during the high update periods
+* ``days`` is weekday meaning Monday to Friday
+* ``start`` is time of day when the high update should start
+* ``stop`` is time of day when the high update should stop
 
 ## Find stationid
 You need to set a stationid in the configuration and to find that run the following helper

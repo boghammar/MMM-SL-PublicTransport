@@ -30,14 +30,17 @@ module.exports = NodeHelper.create({
     // --------------------------------------- Schedule a departure update
     scheduleUpdate: function () {
         var self = this;
+        debug('scheduleUpdate=' + self.getNextUpdateInterval());
         this.updatetimer = setInterval(function () { // This timer is saved in uitimer so that we can cancel it
             self.getDepartures();
-        }, self.config.updateInterval);
+        }, self.getNextUpdateInterval());
     },
 
     // --------------------------------------- Retrive departure info
     getDepartures: function () {
         var self = this;
+
+        clearInterval(this.updatetimer); // Clear the timer so that we can set it again
 
         log('Getting departures for station id ' + this.config.stationid);
         // http://api.sl.se/api2/realtimedeparturesV4.<FORMAT>?key=<DIN API NYCKEL>&siteid=<SITEID>&timewindow=<TIMEWINDOW>
@@ -105,6 +108,8 @@ module.exports = NodeHelper.create({
                 log('Problems: ' + err);
                 self.sendSocketNotification('SERVICE_FAILURE', { resp: { StatusCode: 600, Message: err } });
             });
+
+            self.scheduleUpdate(); // reinitiate the timer
     },
 
     // --------------------------------------- Add departures to our departures array
@@ -181,6 +186,15 @@ module.exports = NodeHelper.create({
         }
         //debug("IX: "+ ix + " LL:" + ll + " wasarray " + wasarray);                            
         return ll;
+    },
+
+    // --------------------------------------- Figure out the next update time
+    getNextUpdateInterval: function() {
+        if (this.config.highUpdateInterval === undefined) return this.config.updateInterval;
+        // TODO: dont throw here use the normal update time but log the errors
+        if (this.config.highUpdateInterval.times === undefined) throw new Error("highUpdateInterval.times is undefined in configuration")
+        if (!Array.isArray(this.config.highUpdateInterval.times)) throw new Error("highUpdateInterval.times is not an array")
+        return this.config.highUpdateInterval.updateInterval
     },
 
     // --------------------------------------- Handle notifocations
