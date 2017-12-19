@@ -25,6 +25,7 @@ Module.register("MMM-SL-PublicTransport", {
         stationname: '',
         updateInterval: 5 * 60 * 1000,
         uiUpdateInterval: 1000,
+        delayThreshhold: 60,
         direction: '',
         lines: [],
         showdisturbances: false,
@@ -168,12 +169,16 @@ Module.register("MMM-SL-PublicTransport", {
     // Returns a HTML element that shall be added to the current row
     getDepartureTime: function (tableTime, expectedTime) {
         var td = document.createElement("td");
-        if (tableTime == expectedTime) { // There's no delay
-            td.innerHTML = this.timeRemaining(moment(tableTime));
+        tt = moment(tableTime);
+        et = moment(expectedTime);
+        var dur = tt.diff(et, 'seconds');
+        //Log.info("TT="+tt + "ET="+et + " Dur=" + dur);
+        if (dur < this.config.delayThreshhold && dur > -this.config.delayThreshhold) { // (tableTime == expectedTime) { // There's no delay
+            td.innerHTML = this.timeRemaining(tt) + (this.config.debug ? " " + dur : "");
         } else {
             td.innerHTML = this.timeRemaining(moment(expectedTime)) + ' ';
             var sp = document.createElement("span");
-            sp.innerHTML = this.timeRemaining(moment(tableTime), true);
+            sp.innerHTML = this.timeRemaining(tt, true) + (this.config.debug ? " " + dur : "");
             sp.style.textDecoration = "line-through" // TODO Change this to a custom style
             td.appendChild(sp);
         }

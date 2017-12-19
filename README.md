@@ -42,18 +42,24 @@ modules: [
                                             // This second variant can only be used when direction has a value
                                             // See the description on "in to town" functionality below.  
             showdisturbances: false,        // Not implemented yet
-            fade: true,                     // Shall the table of departures be faded or not
-            fadePoint: 0.2,                 // Fraction from end where to start fading
-            updateInterval: 5*60*100,       // Number of milliseconds between calls to Trafiklab's API
+            fade: true,                     // Optional. Shall the table of departures be faded or not
+            fadePoint: 0.2,                 // Optional. Fraction from end where to start fading
+            delayThreshhold: 60,            // Optional. If a departure is delayed or in advance only
+                                            // show this
+                                            // if the delay/advance is greater than this number in
+                                            // seconds.            
+            updateInterval: 5*60*100,       // Optional. Number of milliseconds between calls to 
+                                            // Trafiklab's API
                                             // There are limitations on number of calls per minute and month
-            highUpdateInterval: {}          // If defined use higher frequences for updates, see 
+            highUpdateInterval: {}          // Optional. If defined use higher frequences for updates, see 
                                             // "Set what times to update more frequently" below
-            uiUpdateInterval: 1000,         // Number of milliseconds between updates of the departure list 
-            SSL: false,                     // Use https to access the TrafikLab services, defaults to
-                                            // false since I have experienced problems accessing this 
-                                            // service over https. Have an ongoing discussion with 
-                                            // TrafikLab
-            debug: false,                   // Enable some extra output when debugging
+            uiUpdateInterval: 1000,         // Optional. Number of milliseconds between updates of the
+                                            // departure list 
+            SSL: false,                     // Optional. Use https to access the TrafikLab services, 
+                                            // defaults to false since I have experienced problems  
+                                            // accessing this service over https. Have an ongoing  
+                                            // discussion with TrafikLab
+            debug: false,                   // Optional. Enable some extra output when debugging
         }
     },
     ...
