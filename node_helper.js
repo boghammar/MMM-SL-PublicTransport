@@ -194,9 +194,48 @@ module.exports = NodeHelper.create({
         // TODO: dont throw here use the normal update time but log the errors
         if (this.config.highUpdateInterval.times === undefined) throw new Error("highUpdateInterval.times is undefined in configuration")
         if (!Array.isArray(this.config.highUpdateInterval.times)) throw new Error("highUpdateInterval.times is not an array")
-        return this.config.highUpdateInterval.updateInterval
+        
+        //Check which interval we are in and return the proper timer
+        for (var ix = 0 ; ix < this.config.times.length; ix++) {
+            var time = this.config.times[ix];
+            if (this.isBetween(time.days, time.start, time.stop)) return this.config.highUpdateInterval.updateInterval
+        }
+        return this.config.updateInterval
     },
-
+    
+    // --------------------------------------- Check if now is in this time
+    isBetween: function (days, start, stop) {
+        var now = new Date();
+        var dow = now.getDay();
+        switch (days) {
+            case 'weekdays':
+                if (0 < dow && dow < 6) {
+                    return this.isTimeBetween(start, stop);
+                }
+            break;
+            case 'weekends':
+                if (0 == dow || dow == 6) {
+                    return this.isTimeBetween(start, stop);
+                }
+            break;
+        }
+        return false;
+    },
+    
+    // --------------------------------------- Check if now is between these times
+    isTimeBetween: function (start, stop) {
+        var now = new Date();
+        var st = dateObj(start);
+        var en = dateObj(stop);
+        if (st > en) {      // check if start comes before end
+            var temp = st;  // if so, assume it's across midnight
+            st = en;        // and swap the dates
+            en = temp;
+        }
+        
+        return now < en && now >st 
+    },
+        
     // --------------------------------------- Handle notifocations
     socketNotificationReceived: function (notification, payload) {
         const self = this;
@@ -225,8 +264,17 @@ function dynamicSort(property) {
     }
 }
 
+// --------------------------------------- Create a date object with the time in timeStr (hh:mm)
+function dateObj(timeStr) {
+    var parts = timeStr.split(':');
+    var date  = new Date();
+    date.setHours(+parts.shift());
+    date.setMinutes(+parts.shift());
+    return date;
+}
+
 // --------------------------------------- At beginning of log entries
- function logStart() {
+function logStart() {
     return (new Date(Date.now())).toLocaleTimeString() + " MMM-SL-PublicTransport: ";
 }
 

@@ -87,17 +87,19 @@ This parameter is used like this:
     ...
     highUpdateInterval: {updateInterval: 5*60*1000, 
         times: [
-            {days: weekdays, start: 07.00, stop: 09:00},
-            {days: weekdays, start: 16.00, stop: 18:00}
+            {days: 'weekdays', start: 07:00, stop: 09:00},
+            {days: 'weekends', start: 16:00, stop: 18:00}
         ]
     }
     ...
 ```
 where
 * ``updateInterval`` is the frequency to use during the high update periods
-* ``days`` is weekday meaning Monday to Friday
-* ``start`` is time of day when the high update should start
-* ``stop`` is time of day when the high update should stop
+* ``days`` is one of 
+  * ``'weekdays'`` meaning Monday to Friday
+  * ``'weekends'`` meaning Saturday and Sunday
+* ``start`` is time of day when the high update should start in hh:mm format
+* ``stop`` is time of day when the high update should stop in hh:mm format
 
 ## Find stationid
 You need to set a stationid in the configuration and to find that run the following helper
