@@ -40,14 +40,14 @@ modules: [
                                             // a combination of objects with linename and direction
                                             // like [['611', 1], '312', ['629', 2]]. 
                                             // This second variant can only be used when direction has a value
-                                            // See the description on ```"in to town"``` functionality below.  
+                                            // See the description on "in to town" functionality below.  
             showdisturbances: false,        // Not implemented yet
             fade: true,                     // Shall the table of departures be faded or not
             fadePoint: 0.2,                 // Fraction from end where to start fading
             updateInterval: 5*60*100,       // Number of milliseconds between calls to Trafiklab's API
                                             // There are limitations on number of calls per minute and month
-            highUpdateInterval: {}          // if defined use higher frequences for updates, see 
-                                            // ```"Set what times to update more frequently"``` below
+            highUpdateInterval: {}          // If defined use higher frequences for updates, see 
+                                            // "Set what times to update more frequently" below
             uiUpdateInterval: 1000,         // Number of milliseconds between updates of the departure list 
             SSL: false,                     // Use https to access the TrafikLab services, defaults to
                                             // false since I have experienced problems accessing this 
