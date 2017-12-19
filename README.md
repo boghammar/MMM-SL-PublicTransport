@@ -85,7 +85,8 @@ This parameter is used like this:
 
 ```
     ...
-    highUpdateInterval: {updateInterval: 5*60*1000, 
+    highUpdateInterval: {
+        updateInterval: 5*60*1000, 
         times: [
             {days: 'weekdays', start: 07:00, stop: 09:00},
             {days: 'weekends', start: 16:00, stop: 18:00}

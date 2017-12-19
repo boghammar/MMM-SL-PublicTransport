@@ -196,8 +196,8 @@ module.exports = NodeHelper.create({
         if (!Array.isArray(this.config.highUpdateInterval.times)) throw new Error("highUpdateInterval.times is not an array")
         
         //Check which interval we are in and return the proper timer
-        for (var ix = 0 ; ix < this.config.times.length; ix++) {
-            var time = this.config.times[ix];
+        for (var ix = 0 ; ix < this.config.highUpdateInterval.times.length; ix++) {
+            var time = this.config.highUpdateInterval.times[ix];
             if (this.isBetween(time.days, time.start, time.stop)) return this.config.highUpdateInterval.updateInterval
         }
         return this.config.updateInterval
