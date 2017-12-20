@@ -151,5 +151,5 @@ The output will look something like this (searching for 'Erikslund'). Use the Si
 
 ## Screenshot
 
-![SL PublicTransport Module](https://github.com/boghammar/MMM-SL-PublicTransport/blob/master/docs/ScreenShot1.PNG)
+![SL PublicTransport Module](https://github.com/boghammar/MMM-SL-PublicTransport/blob/master/docs/MMMScreenshot2.PNG)
 
