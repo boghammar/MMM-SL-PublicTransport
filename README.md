@@ -85,28 +85,35 @@ Line Destination Departure
 The feature has some limitations. It changes internally the direction number for the lines that are represented as ['line#', dir] so that dir for that line will get the value of direction. It will only show departures that go in 'direction' or in the direction described by the ['line#', dir] format. Hence there will only be one list.
 
 ## Set what times to update more frequently
-If you want the module to update departure times more frequently between certain hours use the ``highUpdateInterval`` config parameter.
+If you want the module to update departure times more frequently between certain hours use the ``highUpdateInterval`` config parameter. This is a feature that will preserve API calls to the TrafikLab API's.
 
 This parameter is used like this:
 
 ```
     ...
+    updateInterval: 5*60*1000, 
     highUpdateInterval: {
-        updateInterval: 5*60*1000, 
+        updateInterval: 1*60*1000, 
         times: [
-            {days: 'weekdays', start: 07:00, stop: 09:00},
-            {days: 'weekends', start: 16:00, stop: 18:00}
+            {days: 'weekdays', start: '07:00', stop: '09:00'},
+            {days: 'weekends', start: '16:00', stop: '18:00'}
         ]
     }
     ...
 ```
 where
 * ``updateInterval`` is the frequency to use during the high update periods
-* ``days`` is one of 
-  * ``'weekdays'`` meaning Monday to Friday
-  * ``'weekends'`` meaning Saturday and Sunday
-* ``start`` is time of day when the high update should start in hh:mm format
-* ``stop`` is time of day when the high update should stop in hh:mm format
+* ``times`` is an array of time ranges defined by
+  * ``days`` is one of 
+    * ``'weekdays'`` meaning Monday to Friday
+    * ``'weekends'`` meaning Saturday and Sunday
+  * ``start`` is time of day when the high update should start in hh:mm format
+  * ``stop`` is time of day when the high update should stop in hh:mm format
+
+In the example above the module will update the departures every 5th minute but between 7 and 9 weekdays and 16 and 18 on weekends the update will be done every minute. You can have as many entries in the times array as you want.
+
+## Having multiple stations
+This is a feature that will come in version 1.3.
 
 ## Find stationid
 You need to set a stationid in the configuration and to find that run the following helper
