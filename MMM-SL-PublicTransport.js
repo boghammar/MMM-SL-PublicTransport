@@ -21,8 +21,8 @@ Module.register("MMM-SL-PublicTransport", {
     // --------------------------------------- Define module defaults
     defaults: {
         apikey: 'PleaseProvideYourOwn',
-        stationid: '',
-        stationname: '',
+        stationid: [],
+        stationname: [],
         updateInterval: 5 * 60 * 1000,
         uiUpdateInterval: 1000,
         delayThreshhold: 60,
@@ -49,23 +49,35 @@ Module.register("MMM-SL-PublicTransport", {
     */
     // --------------------------------------- Get header
     getHeader: function () {
+        var stationname = this.config.stationname[0] + " ";
+        if (this.config.stationname.length > 1) {
+            stationname = "";
+        }
+
         if (this.currentDepartures !== undefined) {
             var format = (this.config.debug ? 'HH:mm:ss' : 'HH:mm');
-            return this.data.header + " " + this.config.stationname + " "
+            return this.data.header + " " + stationname + " "
                 + (this.loaded ? '(' 
-                    + moment(this.currentDepartures.LatestUpdate).format(format) + ')'
-                    + (this.config.debug ? '/('+moment(this.currentDepartures.obtained).format(format)+')' : '') 
+                    + moment(this.currentDepartures[0].LatestUpdate).format(format) + ')'
+                    + (this.config.debug ? '/('+moment(this.currentDepartures[0].obtained).format(format)+')' : '') 
                     : ""
                 );
         } else {
-            return this.data.header + " " + this.config.stationname ;
+            return this.data.header + " " + stationname ;
         }
     },
 
     // --------------------------------------- Start the module
     start: function () {
         Log.info("Starting module: " + this.name);
-
+        // Fix config so that its backward compatible
+        if (!Array.isArray(this.config.stationid)) {
+            this.config.stationid = [this.config.stationid];
+        }
+        if (!Array.isArray(this.config.stationname)) {
+            this.config.stationname = [this.config.stationname];
+        }
+        
         // Set locale.
         moment.locale(config.language);
 
@@ -112,11 +124,12 @@ Module.register("MMM-SL-PublicTransport", {
         table.appendChild(row);
 
         if (this.currentDepartures !== undefined) {
+            var is = 0;
             // ------ Fill in departures
             this.cdir = -1;
             var displayCount = 0;
-            for (var ix = 0; ix < this.currentDepartures.departures.length; ix++) {
-                var dep = this.currentDepartures.departures[ix];
+            for (var ix = 0; ix < this.currentDepartures[is].departures.length; ix++) {
+                var dep = this.currentDepartures[is].departures[ix];
                 if (this.cdir != -1 && this.cdir != dep.JourneyDirection) {
                     // We are changing direction, create an empty row to separate the two directions
                     this.cdir = dep.JourneyDirection;
@@ -230,7 +243,7 @@ Module.register("MMM-SL-PublicTransport", {
             this.failure = undefined;
             // Handle payload
             this.currentDepartures = payload;
-            Log.info("Departures updated: " + this.currentDepartures.departures.length);
+            Log.info("Departures updated: " + this.currentDepartures[0].departures.length);
             this.currentDepartures.obtained = new Date();
             this.updateDom();
         }

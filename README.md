@@ -29,8 +29,8 @@ modules: [
         header: 'Busses',
         config: {
             apikey: 'your-api-key',         // REQUIRED.
-            stationid: 'your-station-id',   // REQUIRED. You need to run the utility findStation to get this
-            stationname: 'name',            // This is the name of the station. 
+            stationid: ['your-station-id'], // REQUIRED. An array of stationid's. You need to run the utility findStation to get this
+            stationname: ['name'],          // This is an array of the name of the stations. 
                                             // It's shown in the header if you have set a header on the module
             direction: 1,                   // Optional, if set only show departures in that direction.
                                             // Direction is either 1 or 2, test to see which one you need.
@@ -48,7 +48,7 @@ modules: [
                                             // show this
                                             // if the delay/advance is greater than this number in
                                             // seconds.            
-            updateInterval: 5*60*100,       // Optional. Number of milliseconds between calls to 
+            updateInterval: 5*60*1000,      // Optional. Number of milliseconds between calls to 
                                             // Trafiklab's API
                                             // There are limitations on number of calls per minute and month
             highUpdateInterval: {}          // Optional. If defined use higher frequences for updates, see 
@@ -113,7 +113,16 @@ where
 In the example above the module will update the departures every 5th minute but between 7 and 9 weekdays and 16 and 18 on weekends the update will be done every minute. You can have as many entries in the times array as you want.
 
 ## Having multiple stations
-This is a feature that will come in version 1.3.
+By adding more then one ``stationid`` in the stationid array you can monitor several stations. If you have multiple stations the ``stationname`` array also need to hold the same number of stationnames.
+
+Example of such config is:
+```
+    ...
+    stationid: ['2235', '1233'], 
+    stationname: ['StationOne', 'StationTwo'],        
+    ...
+```
+Please note that having multiple stations will increase the number of API calls made since there's one call per station. You can mitigate this by carefully setting the ``updateInterval`` and ``highUpdateInterval`` configuration parameters. 
 
 ## Find stationid
 You need to set a stationid in the configuration and to find that run the following helper

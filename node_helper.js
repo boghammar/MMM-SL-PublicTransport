@@ -42,14 +42,48 @@ module.exports = NodeHelper.create({
 
         clearInterval(this.updatetimer); // Clear the timer so that we can set it again
 
-        log('Getting departures for station id ' + this.config.stationid);
+        debug("stationid is array="+Array.isArray(this.config.stationid));
+        var Proms = [];
+        // Loop over all stations
+        this.config.stationid.forEach(stationid => {
+            var P = new Promise((resolve, reject) => {
+                self.getDeparture(stationid, resolve, reject);
+            });
+            debug('Pushing promise for station ' + stationid);
+            console.log(P);
+            Proms.push(P);
+        });
+
+        Promise.all(Proms).then(CurrentDeparturesArray => {
+            debug('all promises resolved '+CurrentDeparturesArray);
+            self.sendSocketNotification('DEPARTURES', CurrentDeparturesArray); // Send departures to module
+        }).catch(reason => {
+            debug('One or more promises rejected '+reason);
+            self.sendSocketNotification('SERVICE_FAILURE', reason);
+        });
+
+        self.scheduleUpdate(); // reinitiate the timer
+    },
+
+    // --------------------------------------- Get departures for one station
+    // The CurrentDepartures object holds this data
+    //  CurrentDepartures = {
+    //      StationId: string
+    //      LatestUpdate: date,     // When the realtime data was updated
+    //      DataAge: ??,            // The age of the data in ??
+    //      departures: [dir][deps] // An array of array of Departure objects
+    //  }
+    getDeparture: function(stationid, resolve, reject) {
+        log('Getting departures for station id ' + stationid);
+        var self = this;
+
         // http://api.sl.se/api2/realtimedeparturesV4.<FORMAT>?key=<DIN API NYCKEL>&siteid=<SITEID>&timewindow=<TIMEWINDOW>
         var transport = (this.config.SSL ? 'https' : 'http');
         var opt = {
             uri: transport + '://api.sl.se/api2/realtimedeparturesV4.json',
             qs: {
-                key: self.config.apikey,
-                siteid: self.config.stationid,
+                key: this.config.apikey,
+                siteid: stationid,
                 timewindow: 60
             },
             json: true
@@ -58,62 +92,62 @@ module.exports = NodeHelper.create({
             opt.agent = new HttpsProxyAgent(Url.parse(this.config.proxy));
             log('SL-PublicTransport: Using proxy ' + this.config.proxy);
         }
-        log('SL-PublicTransport: Calling ' + opt.uri);
+        log('SL-PublicTransport: station id ' + stationid + ' Calling ' + opt.uri);
         console.log(opt);
         request(opt)
             .then(function (resp) {
                 if (resp.StatusCode == 0) {
                     //console.log(resp);
                     var CurrentDepartures = {};
-                    self.departures = [];
+                    var departures = [];
+                    CurrentDepartures.StationId = stationid;
                     CurrentDepartures.LatestUpdate = resp.ResponseData.LatestUpdate; // Anger när realtidsinformationen (DPS) senast uppdaterades.
                     CurrentDepartures.DataAge = resp.ResponseData.DataAge; //Antal sekunder sedan tidsstämpeln LatestUpdate.
-                    self.addDepartures(resp.ResponseData.Metros);
-                    self.addDepartures(resp.ResponseData.Buses);
-                    self.addDepartures(resp.ResponseData.Trains);
-                    self.addDepartures(resp.ResponseData.Trams);
-                    self.addDepartures(resp.ResponseData.Ships);
+                    CurrentDepartures.obtained = new Date(); //When we got it.
+                    self.addDepartures(departures, resp.ResponseData.Metros);
+                    self.addDepartures(departures, resp.ResponseData.Buses);
+                    self.addDepartures(departures, resp.ResponseData.Trains);
+                    self.addDepartures(departures, resp.ResponseData.Trams);
+                    self.addDepartures(departures, resp.ResponseData.Ships);
                     //console.log(self.departures);
 
                     // Sort on ExpectedDateTime
-                    for (var ix = 0; ix < self.departures.length; ix++) {
-                        if (self.departures[ix] !== undefined) {
-                            self.departures[ix].sort(dynamicSort('ExpectedDateTime'))
+                    for (var ix = 0; ix < departures.length; ix++) {
+                        if (departures[ix] !== undefined) {
+                            departures[ix].sort(dynamicSort('ExpectedDateTime'))
                         }
                     }
-                    //console.log(self.departures);
+                    //console.log(departures);
 
                     // Add the sorted arrays into one array
                     var temp = []
-                    for (var ix = 0; ix < self.departures.length; ix++) {
-                        if (self.departures[ix] !== undefined) {
-                            for (var iy = 0; iy < self.departures[ix].length; iy++) {
-                                temp.push(self.departures[ix][iy]);
+                    for (var ix = 0; ix < departures.length; ix++) {
+                        if (departures[ix] !== undefined) {
+                            for (var iy = 0; iy < departures[ix].length; iy++) {
+                                temp.push(departures[ix][iy]);
                             }
                         }
                     }
                     //console.log(temp);
 
                     // TODO:Handle resp.ResponseData.StopPointDeviations
-                    CurrentDepartures.departures = temp; //self.departures;
-                    log("Sending DEPARTURES " + CurrentDepartures.departures.length);
-                    self.sendSocketNotification('DEPARTURES', CurrentDepartures); // Send departures to module
+                    CurrentDepartures.departures = temp; 
+                    log('Sending DEPARTURES station id=' + stationid + ' ' + CurrentDepartures.departures.length);
+                    resolve(CurrentDepartures);
 
                 } else {
-                    log("Something went wrong: " + resp.StatusCode + ': ' + resp.Message);
-                    self.sendSocketNotification('SERVICE_FAILURE', resp);
+                    log('Something went wrong: station id=' + stationid + ' ' + resp.StatusCode + ': ' + resp.Message);
+                    reject(resp);
                 }
             })
             .catch(function (err) {
-                log('Problems: ' + err);
-                self.sendSocketNotification('SERVICE_FAILURE', { resp: { StatusCode: 600, Message: err } });
+                log('Problems: station id=' + stationid + ' ' + err);
+                reject( { resp: { StatusCode: 600, Message: err } });
             });
-
-            self.scheduleUpdate(); // reinitiate the timer
     },
 
     // --------------------------------------- Add departures to our departures array
-    addDepartures: function (depArray) {
+    addDepartures: function (departures, depArray) {
         for (var ix = 0; ix < depArray.length; ix++) {
             var element = depArray[ix];
             var dep = new Departure(element);
@@ -123,10 +157,10 @@ module.exports = NodeHelper.create({
                 if (this.isWantedDirection(dep.JourneyDirection)) {
                     debug("BLine: " + dep.LineNumber + " Dir:" + dep.JourneyDirection + " Dst:" + dep.Destination);
                     debug("ALine: " + dep.LineNumber + " Dir:" + dep.JourneyDirection + " Dst:" + dep.Destination);
-                    if (this.departures[dep.JourneyDirection] === undefined) {
-                        this.departures[dep.JourneyDirection] = [];
+                    if (departures[dep.JourneyDirection] === undefined) {
+                        departures[dep.JourneyDirection] = [];
                     }
-                    this.departures[dep.JourneyDirection].push(dep);
+                    departures[dep.JourneyDirection].push(dep);
                 }
             }
         }
