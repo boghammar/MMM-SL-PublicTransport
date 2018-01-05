@@ -108,56 +108,71 @@ Module.register("MMM-SL-PublicTransport", {
         var table = document.createElement("table");
         table.className = "xsmall";
 
-        // ------ Table header
-        var row = document.createElement("tr");
-        var th = document.createElement("th");
-        th.innerHTML = "Line&nbsp;"
-        th.className = 'align-left';
-        row.appendChild(th);
-        th = document.createElement("th");
-        th.innerHTML = "Destination"
-        th.className = 'align-left';
-        row.appendChild(th);
-        th = document.createElement("th");
-        th.innerHTML = "Departure"
-        row.appendChild(th);
-        table.appendChild(row);
-
         if (this.currentDepartures !== undefined) {
-            var is = 0;
-            // ------ Fill in departures
-            this.cdir = -1;
-            var displayCount = 0;
-            for (var ix = 0; ix < this.currentDepartures[is].departures.length; ix++) {
-                var dep = this.currentDepartures[is].departures[ix];
-                if (this.cdir != -1 && this.cdir != dep.JourneyDirection) {
-                    // We are changing direction, create an empty row to separate the two directions
-                    this.cdir = dep.JourneyDirection;
+            for (var is = 0; is < this.currentDepartures.length; is++) {
+                if (is > 0) { // Create empty row
                     var row = document.createElement("tr");
-                    row.className = 'sup';
-                    var td = document.createElement("td");
-                    td.colSpan = 3;
-                    td.innerHTML = '&nbsp;';
-                    row.appendChild(td);
+                    var th = document.createElement("th");                        
+                    th.innerHTML = "&nbsp;"
+                    row.appendChild(th);
                     table.appendChild(row);
-                    displayCount = 0; // Restart count of number of items to display for this new direction
                 }
-                displayCount++;
-                if (displayCount <= this.config.displaycount) { // Only show displaycount entries
-                    if (this.cdir == -1) this.cdir = dep.JourneyDirection;
+                if (this.currentDepartures.length > 1) {
                     var row = document.createElement("tr");
-                    var td = document.createElement("td");
-                    td.className = 'align-left';
-                    td.innerHTML = dep.LineNumber;
-                    row.appendChild(td);
-                    td = document.createElement("td");
-                    td.innerHTML = dep.Destination;
-                    td.className = 'align-left';
-                    row.appendChild(td);
-                    td = this.getDepartureTime(dep.TimeTabledDateTime, dep.ExpectedDateTime);
-                    row.appendChild(td);
+                    var th = document.createElement("th");                        
+                    th.innerHTML = this.config.stationname[is];
+                    row.appendChild(th);
                     table.appendChild(row);
-                    this.setFade(row, /*ix*/displayCount, /*this.currentDepartures.departures.length*/this.config.displaycount, this.config.fade, this.config.fadePoint);
+                }
+                // ------ Table header
+                var row = document.createElement("tr");
+                var th = document.createElement("th");
+                th.innerHTML = "Line&nbsp;"
+                th.className = 'align-left';
+                row.appendChild(th);
+                th = document.createElement("th");
+                th.innerHTML = "Destination"
+                th.className = 'align-left';
+                row.appendChild(th);
+                th = document.createElement("th");
+                th.innerHTML = "Departure"
+                row.appendChild(th);
+                table.appendChild(row);
+
+                // ------ Fill in departures
+                this.cdir = -1;
+                var displayCount = 0;
+                for (var ix = 0; ix < this.currentDepartures[is].departures.length; ix++) {
+                    var dep = this.currentDepartures[is].departures[ix];
+                    if (this.cdir != -1 && this.cdir != dep.JourneyDirection) {
+                        // We are changing direction, create an empty row to separate the two directions
+                        this.cdir = dep.JourneyDirection;
+                        var row = document.createElement("tr");
+                        row.className = 'sup';
+                        var td = document.createElement("td");
+                        td.colSpan = 3;
+                        td.innerHTML = '&nbsp;';
+                        row.appendChild(td);
+                        table.appendChild(row);
+                        displayCount = 0; // Restart count of number of items to display for this new direction
+                    }
+                    displayCount++;
+                    if (displayCount <= this.config.displaycount) { // Only show displaycount entries
+                        if (this.cdir == -1) this.cdir = dep.JourneyDirection;
+                        var row = document.createElement("tr");
+                        var td = document.createElement("td");
+                        td.className = 'align-left';
+                        td.innerHTML = dep.LineNumber;
+                        row.appendChild(td);
+                        td = document.createElement("td");
+                        td.innerHTML = dep.Destination;
+                        td.className = 'align-left';
+                        row.appendChild(td);
+                        td = this.getDepartureTime(dep.TimeTabledDateTime, dep.ExpectedDateTime);
+                        row.appendChild(td);
+                        table.appendChild(row);
+                        this.setFade(row, /*ix*/displayCount, /*this.currentDepartures.departures.length*/this.config.displaycount, this.config.fade, this.config.fadePoint);
+                    }
                 }
             }
         }

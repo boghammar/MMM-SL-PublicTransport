@@ -29,7 +29,7 @@ modules: [
         header: 'Busses',
         config: {
             apikey: 'your-api-key',         // REQUIRED.
-            stationid: ['your-station-id'], // REQUIRED. An array of stationid's. You need to run the utility findStation to get this
+            stationid: [your-station-id],   // REQUIRED. An array of stationid's. You need to run the utility findStation to get this
             stationname: ['name'],          // This is an array of the name of the stations. 
                                             // It's shown in the header if you have set a header on the module
             direction: 1,                   // Optional, if set only show departures in that direction.
@@ -118,11 +118,13 @@ By adding more then one ``stationid`` in the stationid array you can monitor sev
 Example of such config is:
 ```
     ...
-    stationid: ['2235', '1233'], 
-    stationname: ['StationOne', 'StationTwo'],        
+    stationid: [2322, 2326], 
+    stationname: ['Erikslund', 'Anbudsvägen'],        
     ...
 ```
-Please note that having multiple stations will increase the number of API calls made since there's one call per station. You can mitigate this by carefully setting the ``updateInterval`` and ``highUpdateInterval`` configuration parameters. 
+Please note that having multiple stations will increase the number of API calls made since there's one call per station. You can mitigate this by carefully setting the ``updateInterval`` and ``highUpdateInterval`` configuration parameters.
+
+Also, having multiple stations will increase the space that this module takes on screen so use the ``displaycount`` parameter to limit the number of departures shown. 
 
 ## Find stationid
 You need to set a stationid in the configuration and to find that run the following helper
