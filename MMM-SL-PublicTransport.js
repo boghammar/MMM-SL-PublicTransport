@@ -33,6 +33,7 @@ Module.register("MMM-SL-PublicTransport", {
         fadePoint: 0.2,
         displaycount: 10,
         SSL: false,
+        ignoreSanityCheck: false,
     },
 
     // --------------------------------------- Define required scripts
@@ -77,7 +78,24 @@ Module.register("MMM-SL-PublicTransport", {
         if (!Array.isArray(this.config.stationname)) {
             this.config.stationname = [this.config.stationname];
         }
-        
+        // Sanity check config
+        if (!this.config.ignoreSanityCheck) {
+            var msg = "";
+            if (this.config.updateInterval < 1*60*1000) {
+                msg = msg + "\rupdateInterval too low, set to 1min";
+                this.config.updateInterval = 1*60*1000;
+            }
+            if (this.config.uiUpdateInterval > 10*1000) {
+                msg = msg + "\ruiUpdateInterval too high, set to 10s";
+                this.config.uiUpdateInterval = 10*1000;
+            }
+            if (this.config.updateInterval < this.config.uiUpdateInterval) {
+                msg = msg + "\rupdateInterval lower then uiUpdate, set to uiUpdateInterval";
+                this.config.updateInterval = this.config.uiUpdateInterval;
+            }
+            if (msg.length > 0) this.config.sanityCheck = msg;
+        }
+
         // Set locale.
         moment.locale(config.language);
 
@@ -185,6 +203,16 @@ Module.register("MMM-SL-PublicTransport", {
                 : (this.failure.resp.Message.Message !== undefined ? this.failure.resp.Message 
                     : this.failure.resp.Message.message ));
             div.innerHTML = moment(new Date()).format('HH:mm') +" Service: " + this.failure.resp.StatusCode + '-' + msg;
+            div.style.color = "red"; // TODO Change this to a custom style
+            div.className = "xsmall";
+            wrapper.appendChild(div);
+        }
+
+        // ----- Show other problems
+        if (this.config.sanityCheck !== undefined) {
+            var div = document.createElement("div");
+            var msg = this.config.sanityCheck.replace(/\r/g, '<br />');
+            div.innerHTML = " Sanitycheck: " + msg;
             div.style.color = "red"; // TODO Change this to a custom style
             div.className = "xsmall";
             wrapper.appendChild(div);

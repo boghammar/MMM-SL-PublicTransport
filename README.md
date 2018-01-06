@@ -49,22 +49,28 @@ modules: [
                                             // if the delay/advance is greater than this number in
                                             // seconds.            
             updateInterval: 5*60*1000,      // Optional. Number of milliseconds between calls to 
-                                            // Trafiklab's API
+                                            // Trafiklab's API. This value shall preferably be larger then 1 min
                                             // There are limitations on number of calls per minute and month
             highUpdateInterval: {}          // Optional. If defined use higher frequences for updates, see 
                                             // "Set what times to update more frequently" below
             uiUpdateInterval: 1000,         // Optional. Number of milliseconds between updates of the
-                                            // departure list 
+                                            // departure list. This value shall preferably be less then 10 sec 
             SSL: false,                     // Optional. Use https to access the TrafikLab services, 
                                             // defaults to false since I have experienced problems  
                                             // accessing this service over https. Have an ongoing  
                                             // discussion with TrafikLab
             debug: false,                   // Optional. Enable some extra output when debugging
+            ignoreSanityCheck: false        // Optional. If set to true config sanity checks are not done.
         }
     },
     ...
 ]
 ```
+By default the following sanity checks are done on the configuration. The sanitycheck can be ignored with the ``ignoreSanityCheck`` parameter.
+
+* ``updateInterval`` shall be larger or equal to 1 min (1\*60\*1000 milliseconds) 
+* ``uiUpdateInterval`` shall be smaller or equal to 10 sec (10\*1000 milliseconds) 
+
 ## In to town
 
 If you only want to see the departures "in to town" and your station has several lines that have different directions "in to town" you can configure the module like this
