@@ -66,7 +66,7 @@ modules: [
     ...
 ]
 ```
-By default the following sanity checks are done on the configuration. The sanitycheck can be ignored with the ``ignoreSanityCheck`` parameter.
+By default the following sanity checks are done on the configuration. The sanity checks can be ignored with the ``ignoreSanityCheck`` parameter.
 
 * ``updateInterval`` shall be larger or equal to 1 min (1\*60\*1000 milliseconds) 
 * ``uiUpdateInterval`` shall be smaller or equal to 10 sec (10\*1000 milliseconds) 
@@ -139,7 +139,7 @@ You need to set a stationid in the configuration and to find that run the follow
 
 where ``apikey`` is your API key for the SL Platsuppslag API and ``searchstring`` is the name of the station.
 
-__NOTE__: This API key is not the same as the API key for SL Realtidinformation 4 API that you hace to enter in the module configuration.
+__NOTE__: This API key is not the same as the API key for "SL Realtidinformation 4" API that you have to enter in the module configuration.
 
 The output will look something like this (searching for 'Erikslund'). Use the SiteId value as the stationid:
 

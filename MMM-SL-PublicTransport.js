@@ -212,7 +212,7 @@ Module.register("MMM-SL-PublicTransport", {
         if (this.config.sanityCheck !== undefined) {
             var div = document.createElement("div");
             var msg = this.config.sanityCheck.replace(/\r/g, '<br />');
-            div.innerHTML = " Sanitycheck: " + msg;
+            div.innerHTML = " Sanity check failed. Correct configuration: " + msg;
             div.style.color = "red"; // TODO Change this to a custom style
             div.className = "xsmall";
             wrapper.appendChild(div);
