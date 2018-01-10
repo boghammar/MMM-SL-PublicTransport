@@ -226,7 +226,11 @@ module.exports = NodeHelper.create({
     getNextUpdateInterval: function() {
         if (this.config.highUpdateInterval === undefined) return this.config.updateInterval;
         // TODO: dont throw here use the normal update time but log the errors
-        if (this.config.highUpdateInterval.times === undefined) throw new Error("highUpdateInterval.times is undefined in configuration")
+        if (this.config.highUpdateInterval.times === undefined) {
+            log("ERROR: highUpdateInterval.times is undefined in configuration."
+                + " Please remove the highUpdateInterval parameter if you do not use it.");
+            return this.config.updateInterval;
+        }
         if (!Array.isArray(this.config.highUpdateInterval.times)) throw new Error("highUpdateInterval.times is not an array")
         
         //Check which interval we are in and return the proper timer
@@ -234,7 +238,7 @@ module.exports = NodeHelper.create({
             var time = this.config.highUpdateInterval.times[ix];
             if (this.isBetween(time.days, time.start, time.stop)) return this.config.highUpdateInterval.updateInterval
         }
-        return this.config.updateInterval
+        return this.config.updateInterval;
     },
     
     // --------------------------------------- Check if now is in this time

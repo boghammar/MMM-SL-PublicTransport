@@ -52,7 +52,8 @@ modules: [
             updateInterval: 5*60*1000,      // Optional. Number of milliseconds between calls to 
                                             // Trafiklab's API. This value shall preferably be larger then 1 min
                                             // There are limitations on number of calls per minute and month
-            highUpdateInterval: {}          // Optional. If defined use higher frequences for updates, see 
+            highUpdateInterval: {},         // Optional if you dont need it don't define it. 
+                                            // If defined use higher frequences for updates, see 
                                             // "Set what times to update more frequently" below
             uiUpdateInterval: 1000,         // Optional. Number of milliseconds between updates of the
                                             // departure list. This value shall preferably be less then 10 sec 
