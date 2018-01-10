@@ -106,7 +106,7 @@ This parameter is used like this:
             {days: 'weekdays', start: '07:00', stop: '09:00'},
             {days: 'weekends', start: '16:00', stop: '18:00'}
         ]
-    }
+    },
     ...
 ```
 where
