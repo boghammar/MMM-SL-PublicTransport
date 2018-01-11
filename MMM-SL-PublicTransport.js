@@ -139,6 +139,7 @@ Module.register("MMM-SL-PublicTransport", {
                     var row = document.createElement("tr");
                     var th = document.createElement("th");                        
                     th.innerHTML = this.config.stationname[is];
+                    th.className = 'align-left';
                     row.appendChild(th);
                     table.appendChild(row);
                 }

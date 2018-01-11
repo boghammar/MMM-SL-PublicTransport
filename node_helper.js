@@ -90,9 +90,9 @@ module.exports = NodeHelper.create({
         };
         if (this.config.proxy !== undefined) {
             opt.agent = new HttpsProxyAgent(Url.parse(this.config.proxy));
-            log('SL-PublicTransport: Using proxy ' + this.config.proxy);
+            debug('SL-PublicTransport: Using proxy ' + this.config.proxy);
         }
-        log('SL-PublicTransport: station id ' + stationid + ' Calling ' + opt.uri);
+        debug('SL-PublicTransport: station id ' + stationid + ' Calling ' + opt.uri);
         console.log(opt);
         request(opt)
             .then(function (resp) {
@@ -132,7 +132,7 @@ module.exports = NodeHelper.create({
 
                     // TODO:Handle resp.ResponseData.StopPointDeviations
                     CurrentDepartures.departures = temp; 
-                    log('Sending DEPARTURES station id=' + stationid + ' ' + CurrentDepartures.departures.length);
+                    log('Found ' + CurrentDepartures.departures.length + ' DEPARTURES for station id=' + stationid);
                     resolve(CurrentDepartures);
 
                 } else {
@@ -227,8 +227,8 @@ module.exports = NodeHelper.create({
         if (this.config.highUpdateInterval === undefined) return this.config.updateInterval;
         // TODO: dont throw here use the normal update time but log the errors
         if (this.config.highUpdateInterval.times === undefined) {
-            log("ERROR: highUpdateInterval.times is undefined in configuration."
-                + " Please remove the highUpdateInterval parameter if you do not use it.");
+            log("ERROR: highUpdateInterval.times is undefined in configuration.");
+            log("ERROR: Please remove the highUpdateInterval parameter if you do not use it.");
             return this.config.updateInterval;
         }
         if (!Array.isArray(this.config.highUpdateInterval.times)) throw new Error("highUpdateInterval.times is not an array")
