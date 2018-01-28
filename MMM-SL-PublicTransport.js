@@ -34,6 +34,7 @@ Module.register("MMM-SL-PublicTransport", {
         displaycount: 10,
         SSL: false,
         ignoreSanityCheck: false,
+        showIcon: true,
     },
 
     // --------------------------------------- Define required scripts
@@ -148,6 +149,7 @@ Module.register("MMM-SL-PublicTransport", {
                 var th = document.createElement("th");
                 th.innerHTML = "Line&nbsp;"
                 th.className = 'align-left';
+                th.colSpan = (this.config.showIcon ? 2 : 1);
                 row.appendChild(th);
                 th = document.createElement("th");
                 th.innerHTML = "Destination"
@@ -179,16 +181,29 @@ Module.register("MMM-SL-PublicTransport", {
                     if (displayCount <= this.config.displaycount) { // Only show displaycount entries
                         if (this.cdir == -1) this.cdir = dep.JourneyDirection;
                         var row = document.createElement("tr");
-                        var td = document.createElement("td");
-                        td.className = 'align-left';
+                        var td = undefined;
+                        
+                        if (this.config.showIcon) {
+                            td = document.createElement("td");
+                            td.className = 'align-left '+ this.getRideIcon(dep);
+                            td.innerHTML = '&nbsp';
+                            row.appendChild(td);
+                        }
+
+                        td = document.createElement("td");
+                        td.className = 'align-left ';
                         td.innerHTML = dep.LineNumber;
                         row.appendChild(td);
+                        
                         td = document.createElement("td");
                         td.innerHTML = dep.Destination;
                         td.className = 'align-left';
                         row.appendChild(td);
+                        
                         td = this.getDepartureTime(dep.TimeTabledDateTime, dep.ExpectedDateTime);
+                        //td.className = this.getRideIcon(dep);
                         row.appendChild(td);
+                        
                         table.appendChild(row);
                         this.setFade(row, /*ix*/displayCount, /*this.currentDepartures.departures.length*/this.config.displaycount, this.config.fade, this.config.fadePoint);
                     }
@@ -220,6 +235,19 @@ Module.register("MMM-SL-PublicTransport", {
         }
 
         return wrapper;
+    },
+
+    // --------------------------------------- Find the icon for this type of ride
+    // Returns a HTML element that shall be added to the current row
+    getRideIcon: function (dep) {
+        switch (dep.TransportMode) {
+            case 'BUS': return 'fa fa-bus';
+            case 'TRAIN': return 'fa fa-train';
+            case 'METRO': return 'fa fa-subway';
+            case 'SHIP': return 'fa fa-ship';
+            case 'TRAM': return 'fa fa-train';
+        }
+        return '';
     },
 
     // --------------------------------------- Calculate departure time

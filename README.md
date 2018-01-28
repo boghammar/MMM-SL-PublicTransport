@@ -62,7 +62,8 @@ modules: [
                                             // accessing this service over https. Have an ongoing  
                                             // discussion with TrafikLab
             debug: false,                   // Optional. Enable some extra output when debugging
-            ignoreSanityCheck: false        // Optional. If set to true config sanity checks are not done.
+            ignoreSanityCheck: false,       // Optional. If set to true config sanity checks are not done.
+            showIcon: true                  // Optional. If true show an icon of the type of transport
         }
     },
     ...
