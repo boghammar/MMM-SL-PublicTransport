@@ -34,6 +34,7 @@ Module.register("MMM-SL-PublicTransport", {
         displaycount: 10,
         SSL: false,
         ignoreSanityCheck: false,
+        useDisplayTime: false,
     },
 
     // --------------------------------------- Define required scripts
@@ -187,7 +188,7 @@ Module.register("MMM-SL-PublicTransport", {
                         td.innerHTML = dep.Destination;
                         td.className = 'align-left';
                         row.appendChild(td);
-                        td = this.getDepartureTime(dep.TimeTabledDateTime, dep.ExpectedDateTime);
+                        td = this.getDepartureTime(dep.TimeTabledDateTime, dep.ExpectedDateTime, dep.DisplayTime);
                         row.appendChild(td);
                         table.appendChild(row);
                         this.setFade(row, /*ix*/displayCount, /*this.currentDepartures.departures.length*/this.config.displaycount, this.config.fade, this.config.fadePoint);
@@ -224,21 +225,28 @@ Module.register("MMM-SL-PublicTransport", {
 
     // --------------------------------------- Calculate departure time
     // Returns a HTML element that shall be added to the current row
-    getDepartureTime: function (tableTime, expectedTime) {
+    getDepartureTime: function (tableTime, expectedTime, displayTime) {
         var td = document.createElement("td");
-        tt = moment(tableTime);
-        et = moment(expectedTime);
-        var dur = tt.diff(et, 'seconds');
-        //Log.info("TT="+tt + "ET="+et + " Dur=" + dur);
-        if (dur < this.config.delayThreshhold && dur > -this.config.delayThreshhold) { // (tableTime == expectedTime) { // There's no delay
-            td.innerHTML = this.timeRemaining(tt) + (this.config.debug ? " " + dur : "");
-        } else {
-            td.innerHTML = this.timeRemaining(moment(expectedTime)) + ' ';
-            var sp = document.createElement("span");
-            sp.innerHTML = this.timeRemaining(tt, true) + (this.config.debug ? " " + dur : "");
-            sp.style.textDecoration = "line-through" // TODO Change this to a custom style
-            td.appendChild(sp);
+
+        if (!this.config.useDisplayTime && ( tableTime != null && expectedTime != null)) {
+            tt = moment(tableTime);
+            et = moment(expectedTime);
+            var dur = tt.diff(et, 'seconds');
+            //Log.info("TT="+tt + "ET="+et + " Dur=" + dur);
+            if (dur < this.config.delayThreshhold && dur > -this.config.delayThreshhold) { // (tableTime == expectedTime) { // There's no delay
+                td.innerHTML = this.timeRemaining(tt) + (this.config.debug ? " " + dur : "");
+            } else {
+                td.innerHTML = this.timeRemaining(moment(expectedTime)) + ' ';
+                var sp = document.createElement("span");
+                sp.innerHTML = this.timeRemaining(tt, true) + (this.config.debug ? " " + dur : "");
+                sp.style.textDecoration = "line-through" // TODO Change this to a custom style
+                td.appendChild(sp);
+            }
+        } else { //Use Displaytime instead
+            // TODO Calculate the actual displaytime depending on when the API answer was received.
+            td.innerHTML = displayTime+".";
         }
+        
         td.className = "align-right bright";
         return td;
     },

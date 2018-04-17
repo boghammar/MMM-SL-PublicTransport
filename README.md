@@ -62,7 +62,11 @@ modules: [
                                             // accessing this service over https. Have an ongoing  
                                             // discussion with TrafikLab
             debug: false,                   // Optional. Enable some extra output when debugging
-            ignoreSanityCheck: false        // Optional. If set to true config sanity checks are not done.
+            ignoreSanityCheck: false,       // Optional. If set to true config sanity checks are not done.
+            useDisplayTime: false,          // Optional. If true use the actual displaytime that is 
+                                            // received via the API instead of the ExpectedDateTime and
+                                            // TimeTabledDateTime. See the DisplayTime section below.
+
         }
     },
     ...
@@ -133,6 +137,20 @@ Example of such config is:
 Please note that having multiple stations will increase the number of API calls made since there's one call per station. You can mitigate this by carefully setting the ``updateInterval`` and ``highUpdateInterval`` configuration parameters.
 
 Also, having multiple stations will increase the space that this module takes on screen so use the ``displaycount`` parameter to limit the number of departures shown. 
+
+## Use DisplayTime
+The Trafiklab API will return a number of different departure times, TimeTabledDateTime, ExpectedDateTime and DisplayTime. Originally this module used the two first to calculate the departure time and display it. However, it has turned out that for some metro lines these are null (do not have a value) due to some infrastructure changes going on.
+
+When that was discovered the ``useDisplayTime`` configuration parameter was introduced. It is false per default but if it's true the DisplayTime value is presented instead of the calculated departure time based on TimeTabledDateTime and ExpectedDateTime.
+
+Also, if the TimeTabledDateTime and ExpectedDateTime do not have a value (are null) the DisplayTime is used instead. The following screenshot shows how it looks when having ``useDisplayTime`` set to false and have a station that returns null for TimeTabledDateTime and ExpectedDateTime.
+
+![SL PublicTransport Module](https://github.com/boghammar/MMM-SL-PublicTransport/blob/master/docs/useDisplayTime.PNG)
+
+You see that the station Midsommarkransen uses DisplayTime (it's a dot '.' at the end) but the station Erikslund uses the calculated departure time from TimeTabledDateTime and ExpectedDateTime.
+
+Note that if DisplayTime is used there is (currently) no update of that value between ``uiUpdateInterval``. So if there is a big difference between ``uiUpdateInterval`` and ``updateInterval`` there will be a discrepancy. This will be handled in future releases.
+
 
 ## Find stationid
 You need to set a stationid in the configuration and to find that run the following helper
