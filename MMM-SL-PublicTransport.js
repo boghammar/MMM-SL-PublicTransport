@@ -35,6 +35,7 @@ Module.register("MMM-SL-PublicTransport", {
         SSL: false,
         ignoreSanityCheck: false,
         useDisplayTime: false,
+        cleanHeader: false,
     },
 
     // --------------------------------------- Define required scripts
@@ -59,7 +60,7 @@ Module.register("MMM-SL-PublicTransport", {
         if (this.currentDepartures !== undefined) {
             var format = (this.config.debug ? 'HH:mm:ss' : 'HH:mm');
             return this.data.header + " " + stationname + " "
-                + (this.loaded ? '(' 
+                + (this.loaded && !this.config.cleanHeader ? '(' 
                     + moment(this.currentDepartures[0].LatestUpdate).format(format) + ')'
                     + (this.config.debug ? '/('+moment(this.currentDepartures[0].obtained).format(format)+')' : '') 
                     : ""

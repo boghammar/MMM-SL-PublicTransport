@@ -66,6 +66,8 @@ modules: [
             useDisplayTime: false,          // Optional. If true use the actual displaytime that is 
                                             // received via the API instead of the ExpectedDateTime and
                                             // TimeTabledDateTime. See the DisplayTime section below.
+            cleanHeader: false,             // If set to true the last update time is not shown 
+                                            // in the header
 
         }
     },
