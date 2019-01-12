@@ -7,7 +7,7 @@ You need to obtain your own API key's from TrafikLab for the following API's
 * [SL Realtidinformation 4](https://www.trafiklab.se/api/sl-realtidsinformation-4)
 * [SL Platsuppslag](https://www.trafiklab.se/api/sl-platsuppslag)
 
-**Please note**: There's currently some issues at TrafikLab that causes this module to fail sometimes. I have reported the issue and they are working on it. Please follow the thread at [TrafikLab's supportsite]( https://kundo.se/org/trafiklabse/d/problem-med-realtidsinformation-4-och-https/#c2726378)
+~~**Please note**: There's currently some issues at TrafikLab that causes this module to fail sometimes. I have reported the issue and they are working on it. Please follow the thread at [TrafikLab's supportsite]( https://kundo.se/org/trafiklabse/d/problem-med-realtidsinformation-4-och-https/#c2726378)~~
 
 ## Install
 1. Clone repository into ``../modules/`` inside your MagicMirror folder.
@@ -96,7 +96,7 @@ Line Destination Departure
 611  Town        in 11 min
 312  Somewhere   in 12 min 
 ```
-The feature has some limitations. It changes internally the direction number for the lines that are represented as ['line#', dir] so that dir for that line will get the value of direction. It will only show departures that go in 'direction' or in the direction described by the ['line#', dir] format. Hence there will only be one list.
+The feature has some limitations. It changes internally the direction number for the lines that are represented as ['line#', dir] so that dir for that line will get the value of ``direction``. It will only show departures that go in ``direction`` or in the direction described by the ['line#', dir] format. Hence there will only be one list.
 
 ## Set what times to update more frequently
 If you want the module to update departure times more frequently between certain hours use the ``highUpdateInterval`` config parameter. This is a feature that will preserve API calls to the TrafikLab API's.
