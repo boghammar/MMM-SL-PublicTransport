@@ -52,12 +52,14 @@ Module.register("MMM-SL-PublicTransport", {
     */
     // --------------------------------------- Get header
     getHeader: function () {
-        var stationname = this.config.stationname[0] + " ";
-        if (this.config.stationname.length > 1) {
-            stationname = "";
+        if (this.currentDepartures !== undefined) {
+             var stationname = this.currentDepartures[0].StationName; //config.stationname[0] + " ";
+            if (this.currentDepartures.length > 1) { //config.stationname.length > 1) {
+                stationname = "";
+            }
         }
 
-        if (this.currentDepartures !== undefined) {
+        if (this.currentDepartures !== undefined && this.currentDepartures.length > 0) {
             var format = (this.config.debug ? 'HH:mm:ss' : 'HH:mm');
             return this.data.header + " " + stationname + " "
                 + (this.loaded && !this.config.cleanHeader ? '(' 
@@ -94,6 +96,12 @@ Module.register("MMM-SL-PublicTransport", {
             if (this.config.updateInterval < this.config.uiUpdateInterval) {
                 msg = msg + "\rupdateInterval lower then uiUpdate, set to uiUpdateInterval";
                 this.config.updateInterval = this.config.uiUpdateInterval;
+            }
+            if (this.config.stations === undefined) {
+                msg = msg + "\rAs of version 1.5 a new station definition"
+                msg = msg + "\rhas been implemented. Please review the"
+                msg = msg + "\rconfiguration documentation and update"
+                msg = msg + "\ryour config as appropriate."
             }
             if (msg.length > 0) this.config.sanityCheck = msg;
         }
@@ -140,7 +148,7 @@ Module.register("MMM-SL-PublicTransport", {
                 if (this.currentDepartures.length > 1) {
                     var row = document.createElement("tr");
                     var th = document.createElement("th");                        
-                    th.innerHTML = this.config.stationname[is];
+                    th.innerHTML = this.currentDepartures[is].StationName; //this.config.stationname[is];
                     th.className = 'align-left';
                     row.appendChild(th);
                     table.appendChild(row);
@@ -202,6 +210,7 @@ Module.register("MMM-SL-PublicTransport", {
         // ----- Show service failure if any
         if (this.failure !== undefined) {
             var div = document.createElement("div");
+            // TODO This logic needs to be looked over, does not work 100%
             var msg = (this.failure.Message !== undefined ? this.failure.Message 
                 : (this.failure.resp.Message.Message !== undefined ? this.failure.resp.Message 
                     : this.failure.resp.Message.message ));
@@ -296,7 +305,7 @@ Module.register("MMM-SL-PublicTransport", {
             this.failure = undefined;
             // Handle payload
             this.currentDepartures = payload;
-            Log.info("Departures updated: " + this.currentDepartures[0].departures.length);
+            if (this.currentDepartures.length> 0) Log.info("Departures updated: " + this.currentDepartures[0].departures.length);
             this.currentDepartures.obtained = new Date();
             this.updateDom();
         }

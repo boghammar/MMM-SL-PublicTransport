@@ -33,7 +33,7 @@ modules: [
               {
                 stationId: station-id,      // REQUIRED. An id of a station. You need to run the utility
                                             // findStation to get the id(s) of the station(s) you want.
-                stationname: 'station-name',// This is the name of the station.
+                stationname: 'station-name',// Optional. This is the name of the station.
                                             // It's shown in the header if you have set a header on the module
                 lines: [                    // Optional. An array of lines that you want to see departing from this station.
                   line: line-id,            // The id of the line
@@ -41,16 +41,6 @@ modules: [
                 ]
               },
             ]
-            ~~stationid: [your-station-id],   // REQUIRED. An array of stationid's. You need to run the utility
-
-            direction: 1,                   // Optional, if set only show~~ departures in that direction.
-                                            // Direction is either 1 or 2, test to see which one you need.
-            lines: [],                      // Optional, only show the lines listed in the array.
-                                            // This can be a simple array of strings like ['611', '312', '629'] or
-                                            // a combination of objects with linename and direction
-                                            // like [['611', 1], '312', ['629', 2]].
-                                            // This second variant can only be used when direction has a value
-                                            // See the description on "in to town" functionality below.  
             displaycount: 10,               // Optional, show this number of departures for each direction.
             showdisturbances: false,        // Not implemented yet
             fade: true,                     // Optional. Shall the table of departures be faded or not
@@ -109,7 +99,8 @@ Line Destination Departure
 The feature has some limitations. It changes internally the direction number for the lines that are represented as ['line#', dir] so that dir for that line will get the value of ``direction``. It will only show departures that go in ``direction`` or in the direction described by the ['line#', dir] format. Hence there will only be one list.
 
 ## Set what times to update more frequently
-If you want the module to update departure times more frequently between certain hours use the ``highUpdateInterval`` config parameter. This is a feature that will preserve API calls to the TrafikLab API's.
+If you want the module to update departure
+ times more frequently between certain hours use the ``highUpdateInterval`` config parameter. This is a feature that will preserve API calls to the TrafikLab API's.
 
 This parameter is used like this:
 

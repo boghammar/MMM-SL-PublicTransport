@@ -42,25 +42,30 @@ module.exports = NodeHelper.create({
 
         clearInterval(this.updatetimer); // Clear the timer so that we can set it again
 
-        debug("stationid is array="+Array.isArray(this.config.stationid));
+        //debug("stationid is array="+Array.isArray(this.config.stationid));
         var Proms = [];
         // Loop over all stations
-        this.config.stationid.forEach(stationid => {
-            var P = new Promise((resolve, reject) => {
-                self.getDeparture(stationid, resolve, reject);
+        if (this.config.stations !== undefined) {
+            this.config.stations.forEach(station => {
+                var P = new Promise((resolve, reject) => {
+                    self.getDeparture(station, resolve, reject);
+                });
+                debug('Pushing promise for station ' + station.stationId);
+                console.log(P);
+                Proms.push(P);
             });
-            debug('Pushing promise for station ' + stationid);
-            console.log(P);
-            Proms.push(P);
-        });
 
-        Promise.all(Proms).then(CurrentDeparturesArray => {
-            debug('all promises resolved '+CurrentDeparturesArray);
-            self.sendSocketNotification('DEPARTURES', CurrentDeparturesArray); // Send departures to module
-        }).catch(reason => {
-            debug('One or more promises rejected '+reason);
-            self.sendSocketNotification('SERVICE_FAILURE', reason);
-        });
+            Promise.all(Proms).then(CurrentDeparturesArray => {
+                debug('all promises resolved '+CurrentDeparturesArray);
+                self.sendSocketNotification('DEPARTURES', CurrentDeparturesArray); // Send departures to module
+            }).catch(reason => {
+                debug('One or more promises rejected '+reason);
+                self.sendSocketNotification('SERVICE_FAILURE', reason);
+            });
+        } else {
+            debug('Stations not defined ');
+            self.sendSocketNotification('SERVICE_FAILURE', { resp: { Message: 'config.stations is not defined', StatusCode: 500}});
+        }
 
         self.scheduleUpdate(); // reinitiate the timer
     },
@@ -73,8 +78,8 @@ module.exports = NodeHelper.create({
     //      DataAge: ??,            // The age of the data in ??
     //      departures: [dir][deps] // An array of array of Departure objects
     //  }
-    getDeparture: function(stationid, resolve, reject) {
-        log('Getting departures for station id ' + stationid);
+    getDeparture: function(station, resolve, reject) {
+        log('Getting departures for station id ' + station.stationId);
         var self = this;
 
         // http://api.sl.se/api2/realtimedeparturesV4.<FORMAT>?key=<DIN API NYCKEL>&siteid=<SITEID>&timewindow=<TIMEWINDOW>
@@ -83,7 +88,7 @@ module.exports = NodeHelper.create({
             uri: transport + '://api.sl.se/api2/realtimedeparturesV4.json',
             qs: {
                 key: this.config.apikey,
-                siteid: stationid,
+                siteid: station.stationId,
                 timewindow: 60
             },
             json: true
@@ -92,7 +97,7 @@ module.exports = NodeHelper.create({
             opt.agent = new HttpsProxyAgent(Url.parse(this.config.proxy));
             debug('SL-PublicTransport: Using proxy ' + this.config.proxy);
         }
-        debug('SL-PublicTransport: station id ' + stationid + ' Calling ' + opt.uri);
+        debug('SL-PublicTransport: station id ' + station.stationId + ' Calling ' + opt.uri);
         console.log(opt);
         request(opt)
             .then(function (resp) {
@@ -100,15 +105,16 @@ module.exports = NodeHelper.create({
                     //console.log(resp);
                     var CurrentDepartures = {};
                     var departures = [];
-                    CurrentDepartures.StationId = stationid;
+                    CurrentDepartures.StationId = station.stationId;
+                    CurrentDepartures.StationName = (station.stationName === undefined ? 'NotSet' : station.stationName);
                     CurrentDepartures.LatestUpdate = resp.ResponseData.LatestUpdate; // Anger när realtidsinformationen (DPS) senast uppdaterades.
                     CurrentDepartures.DataAge = resp.ResponseData.DataAge; //Antal sekunder sedan tidsstämpeln LatestUpdate.
                     CurrentDepartures.obtained = new Date(); //When we got it.
-                    self.addDepartures(departures, resp.ResponseData.Metros);
-                    self.addDepartures(departures, resp.ResponseData.Buses);
-                    self.addDepartures(departures, resp.ResponseData.Trains);
-                    self.addDepartures(departures, resp.ResponseData.Trams);
-                    self.addDepartures(departures, resp.ResponseData.Ships);
+                    self.addDepartures(station, departures, resp.ResponseData.Metros);
+                    self.addDepartures(station, departures, resp.ResponseData.Buses);
+                    self.addDepartures(station, departures, resp.ResponseData.Trains);
+                    self.addDepartures(station, departures, resp.ResponseData.Trams);
+                    self.addDepartures(station, departures, resp.ResponseData.Ships);
                     //console.log(self.departures);
 
                     // Sort on ExpectedDateTime
@@ -132,29 +138,29 @@ module.exports = NodeHelper.create({
 
                     // TODO:Handle resp.ResponseData.StopPointDeviations
                     CurrentDepartures.departures = temp; 
-                    log('Found ' + CurrentDepartures.departures.length + ' DEPARTURES for station id=' + stationid);
+                    log('Found ' + CurrentDepartures.departures.length + ' DEPARTURES for station id=' + station.stationId);
                     resolve(CurrentDepartures);
 
                 } else {
-                    log('Something went wrong: station id=' + stationid + ' ' + resp.StatusCode + ': ' + resp.Message);
+                    log('Something went wrong: station id=' + station.stationId + ' ' + resp.StatusCode + ': ' + resp.Message);
                     reject(resp);
                 }
             })
             .catch(function (err) {
-                log('Problems: station id=' + stationid + ' ' + err);
+                log('Problems: station id=' + station.stationId + ' ' + err);
                 reject( { resp: { StatusCode: 600, Message: err } });
             });
     },
 
     // --------------------------------------- Add departures to our departures array
-    addDepartures: function (departures, depArray) {
+    addDepartures: function (station, departures, depArray) {
         for (var ix = 0; ix < depArray.length; ix++) {
             var element = depArray[ix];
             var dep = new Departure(element);
             debug("BLine: " + dep.LineNumber);
-            dep = this.fixJourneyDirection(dep);
-            if (this.isWantedLine(dep.LineNumber)) {
-                if (this.isWantedDirection(dep.JourneyDirection)) {
+            dep = this.fixJourneyDirection(dep); // TODO not needed, remove
+            if (this.isWantedLine(station, dep)) {
+                if (this.isWantedDirection(dep.JourneyDirection)) { // TODO not needed, remove
                     debug("BLine: " + dep.LineNumber + " Dir:" + dep.JourneyDirection + " Dst:" + dep.Destination);
                     debug("ALine: " + dep.LineNumber + " Dir:" + dep.JourneyDirection + " Dst:" + dep.Destination);
                     if (departures[dep.JourneyDirection] === undefined) {
@@ -197,8 +203,31 @@ module.exports = NodeHelper.create({
         return dep;
     },
 
+    // --------------------------------------- Are we asking for this line in this direction
+    isWantedLine: function (station, dep) {
+        if (station.lines !== undefined && Array.isArray(station.lines)) {
+            for (var il=0; il < station.lines.length; il++) { // Check if this is a line we want
+                if (dep.LineNumber == station.lines[il].line) {
+                    debug("Checking direction for line "+ dep.LineNumber + " Dir: " + dep.JourneyDirection)
+                    if (station.lines[il].direction !== undefined) {
+                        if (dep.JourneyDirection == station.lines[il].direction) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    } else {
+                        return true; // We take all directions
+                    }
+                }
+            }
+            return false;
+        } else {
+            return true; // Take all lines on this direction
+        }
+    },
+
     // --------------------------------------- Are we asking for this direction
-    isWantedLine: function (line) {
+    isWantedLineXXX: function (line) {
         if (this.config.lines !== undefined) {
             if (this.config.lines.length > 0) {
                 for (var ix = 0; ix < this.config.lines.length; ix++) {
