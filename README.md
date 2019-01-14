@@ -29,19 +29,19 @@ modules: [
         header: 'Busses',
         config: {
             apikey: 'your-api-key',         // REQUIRED.
-            stationid: [your-station-id],   // REQUIRED. An array of stationid's. You need to run the utility 
+            stationid: [your-station-id],   // REQUIRED. An array of stationid's. You need to run the utility
                                             // findStation to get the id(s) of the station(s) you want.
-            stationname: ['name'],          // This is an array of the name of the stations. 
+            stationname: ['name'],          // This is an array of the name of the stations.
                                             // It's shown in the header if you have set a header on the module
             direction: 1,                   // Optional, if set only show departures in that direction.
                                             // Direction is either 1 or 2, test to see which one you need.
-            displaycount: 10,               // Optional, show this number of departures for each direction.
-            lines: [],                      // Optional, only show the lines listed in the array. 
-                                            // This can be a simple array of strings like ['611', '312', '629'] or 
+            lines: [],                      // Optional, only show the lines listed in the array.
+                                            // This can be a simple array of strings like ['611', '312', '629'] or
                                             // a combination of objects with linename and direction
                                             // like [['611', 1], '312', ['629', 2]]. 
                                             // This second variant can only be used when direction has a value
                                             // See the description on "in to town" functionality below.  
+            displaycount: 10,               // Optional, show this number of departures for each direction.
             showdisturbances: false,        // Not implemented yet
             fade: true,                     // Optional. Shall the table of departures be faded or not
             fadePoint: 0.2,                 // Optional. Fraction from end where to start fading
@@ -49,24 +49,24 @@ modules: [
                                             // show this
                                             // if the delay/advance is greater than this number in
                                             // seconds.            
-            updateInterval: 5*60*1000,      // Optional. Number of milliseconds between calls to 
+            updateInterval: 5*60*1000,      // Optional. Number of milliseconds between calls to
                                             // Trafiklab's API. This value shall preferably be larger then 1 min
                                             // There are limitations on number of calls per minute and month
-            highUpdateInterval: {},         // Optional if you dont need it don't define it. 
-                                            // If defined use higher frequences for updates, see 
+            highUpdateInterval: {},         // Optional if you dont need it don't define it.
+                                            // If defined use higher frequences for updates, see
                                             // "Set what times to update more frequently" below
             uiUpdateInterval: 1000,         // Optional. Number of milliseconds between updates of the
-                                            // departure list. This value shall preferably be less then 10 sec 
-            SSL: false,                     // Optional. Use https to access the TrafikLab services, 
+                                            // departure list. This value shall preferably be less then 10 sec
+            SSL: false,                     // Optional. Use https to access the TrafikLab services,
                                             // defaults to false since I have experienced problems  
                                             // accessing this service over https. Have an ongoing  
                                             // discussion with TrafikLab
             debug: false,                   // Optional. Enable some extra output when debugging
             ignoreSanityCheck: false,       // Optional. If set to true config sanity checks are not done.
-            useDisplayTime: false,          // Optional. If true use the actual displaytime that is 
+            useDisplayTime: false,          // Optional. If true use the actual displaytime that is
                                             // received via the API instead of the ExpectedDateTime and
                                             // TimeTabledDateTime. See the DisplayTime section below.
-            cleanHeader: false,             // If set to true the last update time is not shown 
+            cleanHeader: false,             // If set to true the last update time is not shown
                                             // in the header
 
         }
@@ -76,15 +76,15 @@ modules: [
 ```
 By default the following sanity checks are done on the configuration. The sanity checks can be ignored with the ``ignoreSanityCheck`` parameter.
 
-* ``updateInterval`` shall be larger or equal to 1 min (1\*60\*1000 milliseconds) 
-* ``uiUpdateInterval`` shall be smaller or equal to 10 sec (10\*1000 milliseconds) 
+* ``updateInterval`` shall be larger or equal to 1 min (1\*60\*1000 milliseconds)
+* ``uiUpdateInterval`` shall be smaller or equal to 10 sec (10\*1000 milliseconds)
 
 ## In to town
 
 If you only want to see the departures "in to town" and your station has several lines that have different directions "in to town" you can configure the module like this
 ```
     ...
-    lines: ['611', ['312', 2], ['629',2]],   // Show 312 and 629 in direction 2. 
+    lines: ['611', ['312', 2], ['629',2]],   // Show 312 and 629 in direction 2.
     direction: 1,
     ...
 ```
@@ -94,7 +94,7 @@ Line Destination Departure
 611  Town        in 1 min
 629  Town        in 2 min
 611  Town        in 11 min
-312  Somewhere   in 12 min 
+312  Somewhere   in 12 min
 ```
 The feature has some limitations. It changes internally the direction number for the lines that are represented as ['line#', dir] so that dir for that line will get the value of ``direction``. It will only show departures that go in ``direction`` or in the direction described by the ['line#', dir] format. Hence there will only be one list.
 
@@ -105,9 +105,9 @@ This parameter is used like this:
 
 ```
     ...
-    updateInterval: 5*60*1000, 
+    updateInterval: 5*60*1000,
     highUpdateInterval: {
-        updateInterval: 1*60*1000, 
+        updateInterval: 1*60*1000,
         times: [
             {days: 'weekdays', start: '07:00', stop: '09:00'},
             {days: 'weekends', start: '16:00', stop: '18:00'}
@@ -118,7 +118,7 @@ This parameter is used like this:
 where
 * ``updateInterval`` is the frequency to use during the high update periods
 * ``times`` is an array of time ranges defined by
-  * ``days`` is one of 
+  * ``days`` is one of
     * ``'weekdays'`` meaning Monday to Friday
     * ``'weekends'`` meaning Saturday and Sunday
   * ``start`` is time of day when the high update should start in hh:mm format
@@ -132,13 +132,13 @@ By adding more then one ``stationid`` in the stationid array you can monitor sev
 Example of such config is:
 ```
     ...
-    stationid: [2322, 2326], 
+    stationid: [2322, 2326],
     stationname: ['Erikslund', 'Anbudsvägen'],        
     ...
 ```
 Please note that having multiple stations will increase the number of API calls made since there's one call per station. You can mitigate this by carefully setting the ``updateInterval`` and ``highUpdateInterval`` configuration parameters.
 
-Also, having multiple stations will increase the space that this module takes on screen so use the ``displaycount`` parameter to limit the number of departures shown. 
+Also, having multiple stations will increase the space that this module takes on screen so use the ``displaycount`` parameter to limit the number of departures shown.
 
 ## Use DisplayTime
 The Trafiklab API will return a number of different departure times, TimeTabledDateTime, ExpectedDateTime and DisplayTime. Originally this module used the two first to calculate the departure time and display it. However, it has turned out that for some metro lines these are null (do not have a value) due to some infrastructure changes going on.
@@ -191,4 +191,3 @@ The output will look something like this (searching for 'Erikslund'). Use the Si
 ## Screenshot
 
 ![SL PublicTransport Module](https://github.com/boghammar/MMM-SL-PublicTransport/blob/master/docs/MMMScreenshot2.PNG)
-
