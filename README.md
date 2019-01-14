@@ -29,11 +29,12 @@ modules: [
         header: 'Busses',
         config: {
             apikey: 'your-api-key',         // REQUIRED.
-            stations: [                     // REQUIRED. Definition of the stations that you would like to see
+            stations: [                     // REQUIRED at least one entry. 
+                                            // Definition of the stations that you would like to see
               {
                 stationId: station-id,      // REQUIRED. An id of a station. You need to run the utility
                                             // findStation to get the id(s) of the station(s) you want.
-                stationname: 'station-name',// Optional. This is the name of the station.
+                stationName: 'station-name',// Optional. This is the name of the station.
                                             // It's shown in the header if you have set a header on the module
                 lines: [                    // Optional. An array of lines that you want to see departing from this station.
                   line: line-id,            // The id of the line
@@ -79,7 +80,7 @@ By default the following sanity checks are done on the configuration. The sanity
 * ``updateInterval`` shall be larger or equal to 1 min (1\*60\*1000 milliseconds)
 * ``uiUpdateInterval`` shall be smaller or equal to 10 sec (10\*1000 milliseconds)
 
-## In to town
+## In to town **OBSOLETE see new linefiltering**
 
 If you only want to see the departures "in to town" and your station has several lines that have different directions "in to town" you can configure the module like this
 ```
