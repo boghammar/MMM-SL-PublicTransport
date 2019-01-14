@@ -29,16 +29,26 @@ modules: [
         header: 'Busses',
         config: {
             apikey: 'your-api-key',         // REQUIRED.
-            stationid: [your-station-id],   // REQUIRED. An array of stationid's. You need to run the utility
+            stations: [                     // REQUIRED. Definition of the stations that you would like to see
+              {
+                stationId: station-id,      // REQUIRED. An id of a station. You need to run the utility
                                             // findStation to get the id(s) of the station(s) you want.
-            stationname: ['name'],          // This is an array of the name of the stations.
+                stationname: 'station-name',// This is the name of the station.
                                             // It's shown in the header if you have set a header on the module
-            direction: 1,                   // Optional, if set only show departures in that direction.
+                lines: [                    // Optional. An array of lines that you want to see departing from this station.
+                  line: line-id,            // The id of the line
+                  direction: dir,           // Optional. If present only show departures in this direction for this line.
+                ]
+              },
+            ]
+            ~~stationid: [your-station-id],   // REQUIRED. An array of stationid's. You need to run the utility
+
+            direction: 1,                   // Optional, if set only show~~ departures in that direction.
                                             // Direction is either 1 or 2, test to see which one you need.
             lines: [],                      // Optional, only show the lines listed in the array.
                                             // This can be a simple array of strings like ['611', '312', '629'] or
                                             // a combination of objects with linename and direction
-                                            // like [['611', 1], '312', ['629', 2]]. 
+                                            // like [['611', 1], '312', ['629', 2]].
                                             // This second variant can only be used when direction has a value
                                             // See the description on "in to town" functionality below.  
             displaycount: 10,               // Optional, show this number of departures for each direction.
