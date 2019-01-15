@@ -20,7 +20,7 @@ You need to obtain your own API key's from TrafikLab for the following API's
 2. Run ``npm install`` inside ``../modules/MMM-SL-PublicTransport/`` folder
 
 ## Configuration
-**Note**: This is a major change of the configuration. Please read through carefully and update your configration appropriately. All features present in earlier releases are available but you need to redefine your configuration. The new configuration ``stations`` will allow you to define in more detail what you want to see. For examples see the section [How to use the stations parameter](#How-to-use-the-stations_parameter) below.
+**Note**: This is a major change of the configuration. Please read through carefully and update your configration appropriately. All features present in earlier releases are available but you need to redefine your configuration. The new configuration ``stations`` will allow you to define in more detail what you want to see. For examples see the section [How to use the stations parameter](#how-to-use-the-stations-parameter) below.
 
 ```
 modules: [
