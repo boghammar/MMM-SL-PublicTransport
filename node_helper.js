@@ -142,7 +142,7 @@ module.exports = NodeHelper.create({
                     resolve(CurrentDepartures);
 
                 } else {
-                    log('Something went wrong: station id=' + station.stationId + ' ' + resp.StatusCode + ': ' + resp.Message);
+                    log('Something went wrong: station id=' + station.stationId + ' StatusCode: ' + resp.StatusCode + ' Msg: ' + resp.Message);
                     reject(resp);
                 }
             })
@@ -157,12 +157,11 @@ module.exports = NodeHelper.create({
         for (var ix = 0; ix < depArray.length; ix++) {
             var element = depArray[ix];
             var dep = new Departure(element);
-            debug("BLine: " + dep.LineNumber);
-            dep = this.fixJourneyDirection(dep); // TODO not needed, remove
+            //debug("BLine: " + dep.LineNumber);
+            dep = this.fixJourneyDirection(station, dep); 
             if (this.isWantedLine(station, dep)) {
                 if (this.isWantedDirection(dep.JourneyDirection)) { // TODO not needed, remove
-                    debug("BLine: " + dep.LineNumber + " Dir:" + dep.JourneyDirection + " Dst:" + dep.Destination);
-                    debug("ALine: " + dep.LineNumber + " Dir:" + dep.JourneyDirection + " Dst:" + dep.Destination);
+                    debug("Adding Line: " + dep.LineNumber + " Dir:" + dep.JourneyDirection + " Dst:" + dep.Destination);
                     if (departures[dep.JourneyDirection] === undefined) {
                         departures[dep.JourneyDirection] = [];
                     }
@@ -181,21 +180,15 @@ module.exports = NodeHelper.create({
     },
 
     // --------------------------------------- If we want to change direction number on a line
-    fixJourneyDirection: function (dep) {
-        if (this.config.lines !== undefined && this.config.direction !== undefined) {
-            if (this.config.lines.length > 0) {
-                for (var ix = 0; ix < this.config.lines.length; ix++) {
-                    if (dep.LineNumber == this.getLineNumber(ix)) {
-                        // the line is mentioned in config lines, handle it
-                        if (Array.isArray(this.config.lines[ix])) { //this.config.lines[ix]} !== null && typeof this.config.lines[ix] === 'array') {
-                            if (dep.JourneyDirection == this.config.lines[ix][1]) {
-                                debug("Changing Line: " + dep.LineNumber + " Dir:" + dep.JourneyDirection + " to " + this.config.direction);
-                                dep.JourneyDirection = this.config.direction;
-                            } else {
-                                debug("Hiding Line: " + dep.LineNumber + " Dir:" + dep.JourneyDirection + " to " + this.config.direction);
-                                dep.JourneyDirection = 12; // Just some arbitrary number assuming a line can only have a direction 1 or 2
-                            }
-                        }
+    fixJourneyDirection: function (station, dep) {
+        if (station.lines !== undefined && Array.isArray(station.lines)) {
+            for (var il=0; il < station.lines.length; il++) { // Check if this is a line we have defined
+                if (dep.LineNumber == station.lines[il].line) {
+                    debug("Checking direction for line "+ dep.LineNumber + " Dir: " + dep.JourneyDirection);
+                    if (station.lines[il].swapDir !== undefined && Array.isArray(station.lines[il].swapDir)
+                        && station.lines[il].swapDir[0] == dep.JourneyDirection) {
+                        debug("Swapping direction for line "+ dep.LineNumber + " From: " + dep.JourneyDirection + " To: " + station.lines[il].swapDir[1]);
+                        dep.JourneyDirection = station.lines[il].swapDir[1];
                     }
                 }
             }
@@ -205,24 +198,32 @@ module.exports = NodeHelper.create({
 
     // --------------------------------------- Are we asking for this line in this direction
     isWantedLine: function (station, dep) {
-        if (station.lines !== undefined && Array.isArray(station.lines)) {
-            for (var il=0; il < station.lines.length; il++) { // Check if this is a line we want
-                if (dep.LineNumber == station.lines[il].line) {
-                    debug("Checking direction for line "+ dep.LineNumber + " Dir: " + dep.JourneyDirection)
-                    if (station.lines[il].direction !== undefined) {
-                        if (dep.JourneyDirection == station.lines[il].direction) {
-                            return true;
+        //debug('0 ')
+        if (station.lines !== undefined) {
+            if (Array.isArray(station.lines)) {
+                //debug('1')
+                for (var il=0; il < station.lines.length; il++) { // Check if this is a line we want
+                    //debug('2 '+ il)
+                    if (dep.LineNumber == station.lines[il].line) {
+                        debug("Checking line "+ dep.LineNumber + " Dir: " + dep.JourneyDirection)
+                        if (station.lines[il].direction !== undefined) {
+                            if (dep.JourneyDirection == station.lines[il].direction) {
+                                return true;
+                            } else {
+                                return false;
+                            }
                         } else {
-                            return false;
+                            return true; // We take all directions for this line
                         }
-                    } else {
-                        return true; // We take all directions
                     }
                 }
+                return false;
+            } else {
+                log('Problems: station id=' + station.stationId + ' lines is defined but not as array.');
+                throw new Error('station id=' + station.stationId + ' lines is defined but not as array.')
             }
-            return false;
         } else {
-            return true; // Take all lines on this direction
+            return true; // Take all lines on this station
         }
     },
 

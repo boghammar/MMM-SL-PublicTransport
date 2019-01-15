@@ -214,7 +214,10 @@ Module.register("MMM-SL-PublicTransport", {
             var msg = (this.failure.Message !== undefined ? this.failure.Message 
                 : (this.failure.resp.Message.Message !== undefined ? this.failure.resp.Message 
                     : this.failure.resp.Message.message ));
-            div.innerHTML = moment(new Date()).format('HH:mm') +" Service: " + this.failure.resp.StatusCode + '-' + msg;
+            var status = (this.failure.Message !== undefined ? this.failure.StatusCode 
+                : (this.failure.resp.Message.Message !== undefined ? this.failure.resp.StatusCode 
+                    : this.failure.resp.Message.StatusCode ));
+            div.innerHTML = moment(new Date()).format('HH:mm') +" Service: " + status + '-' + msg;
             div.style.color = "red"; // TODO Change this to a custom style
             div.className = "xsmall";
             wrapper.appendChild(div);

@@ -36,9 +36,14 @@ modules: [
                                             // findStation to get the id(s) of the station(s) you want.
                 stationName: 'station-name',// Optional. This is the name of the station.
                                             // It's shown in the header if you have set a header on the module
-                lines: [                    // Optional. An array of lines that you want to see departing from this station.
+                lines: [                    // Optional. An array of lines that you want to see departing from
+                                            // this station.
                   line: line-id,            // The id of the line
-                  direction: dir,           // Optional. If present only show departures in this direction for this line.
+                  direction: dir,           // Optional. If present only show departures in this direction 
+                                            // for this line.
+                  swapDir: [olddir, newdir] // Optional. If present, if direction is olddir change this to
+                                            // newdir. Shall be used with the "In to town" feature. Note that
+                                            // if direction is defined, that shall be newdir.
                 ]
               },
             ]
