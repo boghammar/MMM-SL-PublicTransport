@@ -20,6 +20,8 @@ You need to obtain your own API key's from TrafikLab for the following API's
 2. Run ``npm install`` inside ``../modules/MMM-SL-PublicTransport/`` folder
 
 ## Configuration
+**Note**: This is a major change of the configuration. Please read through carefully and update your configration appropriately. All features present in earlier releases are available but you need to redefine your configuration. The new configuration ``stations`` will allow you to define in more detail what you want to see. For examples see the section [How to use the stations parameter] below.
+
 ```
 modules: [
     ...
@@ -84,6 +86,77 @@ By default the following sanity checks are done on the configuration. The sanity
 
 * ``updateInterval`` shall be larger or equal to 1 min (1\*60\*1000 milliseconds)
 * ``uiUpdateInterval`` shall be smaller or equal to 10 sec (10\*1000 milliseconds)
+## How to use the stations parameter
+With the ``stations`` configuration parameter you are able to in detail define what you want to see. The basic configuration is that if an optional parameter is not present everything will be shown, i.e. if the ``lines`` parameter is not present for a station all lines will be displayed. However, if it is present you will need to define all lines that you want to see.
+
+### Examples
+Show all departures from one station:
+```
+    ...
+    stations: [
+        {
+            stationId: 2322,
+            stationName: 'Erikslund'
+        }
+    ]
+    ...
+```
+
+Show all departures from two station:
+```
+    ...
+    stations: [
+        {
+            stationId: 2322,
+            stationName: 'Erikslund'
+        },
+        {
+            stationId: 2321,
+            stationName: 'Täbyvägen'
+        }
+    ]
+    ...
+```
+
+Show all departures from one station and only line 610 from the other station:
+```
+    ...
+    stations: [
+        {
+            stationId: 2322,
+            stationName: 'Erikslund'
+        },
+        {
+            stationId: 2321,
+            stationName: 'Täbyvägen',
+            lines: {
+                line: 610
+            }
+        }
+    ]
+    ...
+```
+
+Show all departures from one station and only line 610 from the other station in one direction:
+```
+    ...
+    stations: [
+        {
+            stationId: 2322,
+            stationName: 'Erikslund'
+        },
+        {
+            stationId: 2321,
+            stationName: 'Täbyvägen',
+            lines: {
+                line: 610,
+                direction: 1
+            }
+        }
+    ]
+    ...
+```
+
 
 ## In to town **OBSOLETE see new linefiltering**
 
@@ -133,7 +206,7 @@ where
 
 In the example above the module will update the departures every 5th minute but between 7 and 9 weekdays and 16 and 18 on weekends the update will be done every minute. You can have as many entries in the times array as you want.
 
-## Having multiple stations
+## Having multiple stations OBSOLETE rewrite
 By adding more then one ``stationid`` in the stationid array you can monitor several stations. If you have multiple stations the ``stationname`` array also need to hold the same number of stationnames.
 
 Example of such config is:
