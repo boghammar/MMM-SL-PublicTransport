@@ -181,14 +181,15 @@ module.exports = NodeHelper.create({
 
     // --------------------------------------- If we want to change direction number on a line
     fixJourneyDirection: function (station, dep) {
+        var swapper = [0, 2, 1];
         if (station.lines !== undefined && Array.isArray(station.lines)) {
             for (var il=0; il < station.lines.length; il++) { // Check if this is a line we have defined
                 if (dep.LineNumber == station.lines[il].line) {
                     debug("Checking direction for line "+ dep.LineNumber + " Dir: " + dep.JourneyDirection);
-                    if (station.lines[il].swapDir !== undefined && Array.isArray(station.lines[il].swapDir)
-                        && station.lines[il].swapDir[0] == dep.JourneyDirection) {
-                        debug("Swapping direction for line "+ dep.LineNumber + " From: " + dep.JourneyDirection + " To: " + station.lines[il].swapDir[1]);
-                        dep.JourneyDirection = station.lines[il].swapDir[1];
+                    if (station.lines[il].swapDir !== undefined && station.lines[il].swapDir) {
+                        var newdir = swapper[dep.JourneyDirection];
+                        debug("Swapping direction for line "+ dep.LineNumber + " From: " + dep.JourneyDirection + " To: " + newdir);
+                        dep.JourneyDirection = newdir;
                     }
                 }
             }
