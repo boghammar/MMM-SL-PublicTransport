@@ -76,6 +76,7 @@ modules: [
                                             // TimeTabledDateTime. See the DisplayTime section below.
             cleanHeader: false,             // If set to true the last update time is not shown
                                             // in the header
+            showIcon: true                  // Optional. If true show an icon of the type of transport
 
         }
     },
