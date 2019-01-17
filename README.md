@@ -43,9 +43,9 @@ modules: [
                   line: line-id,            // The id of the line
                   direction: dir,           // Optional. If present only show departures in this direction 
                                             // for this line.
-                  swapDir: [olddir, newdir] // Optional. If present, if direction is olddir change this to
-                                            // newdir. Shall be used with the "In to town" feature. Note that
-                                            // if direction is defined, that shall be newdir.
+                  swapDir: false            // Optional. If true, change dir 1 to 2 and vice versa.
+                                            // Shall be used with the "In to town" feature. Note that
+                                            // if direction is defined, that shall be direction swapped to.
                 ]
               },
             ]
@@ -153,6 +153,28 @@ Show all departures from one station and only line 610 from the other station in
                 line: 610,
                 direction: 1
             }
+        }
+    ]
+    ...
+```
+
+"In To Town" - For one station, show all directions for line 611, for line 616 show only direction 1 (swapDir will change 1->2 and 2->1). Line 616 direction 1 will be shown together with 611 direction 2:
+```
+    ...
+    stations: [
+        {
+            stationId: 2322,
+            stationName: 'Erikslund'
+            lines: [
+                {
+                    line: 611								
+                },
+                {
+                    line: 616,
+                    direction: 2,
+                    swapDir: true
+                }
+            ]
         }
     ]
     ...
