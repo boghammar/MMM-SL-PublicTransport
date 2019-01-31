@@ -40,12 +40,14 @@ modules: [
                                             // It's shown in the header if you have set a header on the module
                 lines: [                    // Optional. An array of lines that you want to see departing from
                                             // this station.
-                  line: line-id,            // The id of the line
-                  direction: dir,           // Optional. If present only show departures in this direction 
-                                            // for this line.
-                  swapDir: false            // Optional. If true, change dir 1 to 2 and vice versa.
-                                            // Shall be used with the "In to town" feature. Note that
-                                            // if direction is defined, that shall be direction swapped to.
+                  {
+                    line: line-id,            // The id of the line
+                    direction: dir,           // Optional. If present only show departures in this direction 
+                                                // for this line.
+                    swapDir: false            // Optional. If true, change dir 1 to 2 and vice versa.
+                                                // Shall be used with the "In to town" feature. Note that
+                                                // if direction is defined, that shall be direction swapped to.
+                  }
                 ]
               },
             ]
@@ -130,9 +132,9 @@ Show all departures from one station and only line 610 from the other station:
         {
             stationId: 2321,
             stationName: 'Täbyvägen',
-            lines: {
+            lines: [{
                 line: 610
-            }
+            }]
         }
     ]
     ...
@@ -149,10 +151,10 @@ Show all departures from one station and only line 610 from the other station in
         {
             stationId: 2321,
             stationName: 'Täbyvägen',
-            lines: {
+            lines: [{
                 line: 610,
                 direction: 1
-            }
+            }]
         }
     ]
     ...
