@@ -150,6 +150,7 @@ Module.register("MMM-SL-PublicTransport", {
                     var th = document.createElement("th");                        
                     th.innerHTML = this.currentDepartures[is].StationName; //this.config.stationname[is];
                     th.className = 'align-left';
+                    th.colSpan = (this.config.showIcon ? 4 : 3);
                     row.appendChild(th);
                     table.appendChild(row);
                 }
@@ -201,9 +202,10 @@ Module.register("MMM-SL-PublicTransport", {
                         }
 
                         var td = document.createElement("td");
-                        td.className = 'align-left';
+                        td.className = 'align-left ';
                         td.innerHTML = dep.LineNumber;
                         row.appendChild(td);
+
                         td = document.createElement("td");
                         td.innerHTML = dep.Destination;
                         td.className = 'align-left';
