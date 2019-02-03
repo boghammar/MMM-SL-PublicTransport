@@ -93,6 +93,14 @@ module.exports = NodeHelper.create({
             },
             json: true
         };
+
+        // Exclude those types of rides that you are not interested in
+        if (station.excludeTransportTypes !== undefined && Array.isArray(station.excludeTransportTypes)) {
+            for (var ix = 0; ix < station.excludeTransportTypes.length; ix++) {
+                opt.qs[station.excludeTransportTypes[ix]] = false
+            }
+        }
+
         if (this.config.proxy !== undefined) {
             opt.agent = new HttpsProxyAgent(Url.parse(this.config.proxy));
             debug('SL-PublicTransport: Using proxy ' + this.config.proxy);

@@ -20,7 +20,7 @@ You need to obtain your own API key's from TrafikLab for the following API's
 2. Run ``npm install`` inside ``../modules/MMM-SL-PublicTransport/`` folder
 
 ## Configuration
-**Note**: This is a major change of the configuration. Please read through carefully and update your configration appropriately. All features present in earlier releases are available but you need to redefine your configuration. The new configuration ``stations`` will allow you to define in more detail what you want to see. For examples see the section [How to use the stations parameter](#how-to-use-the-stations-parameter) below.
+**Note**: In release 1.5 there is a major change of the configuration. Please read through carefully and update your configration appropriately. All features present in earlier releases are available but you need to redefine your configuration. The new configuration ``stations`` will allow you to define in more detail what you want to see. For examples see the section [How to use the stations parameter](#how-to-use-the-stations-parameter) below.
 
 ```
 modules: [
@@ -38,15 +38,18 @@ modules: [
                                             // findStation to get the id(s) of the station(s) you want.
                 stationName: 'station-name',// Optional. This is the name of the station.
                                             // It's shown in the header if you have set a header on the module
+                excludeTransportTypes: [],  // Optional. This is an array of types of transport that you DONT 
+                                            // want to see. If not present then all transport types are shown. 
+                                            // The types are: 'Bus', 'Train', 'Metro', 'Tram' and 'Ship'.
                 lines: [                    // Optional. An array of lines that you want to see departing from
                                             // this station.
                   {
-                    line: line-id,            // The id of the line
-                    direction: dir,           // Optional. If present only show departures in this direction 
-                                                // for this line.
-                    swapDir: false            // Optional. If true, change dir 1 to 2 and vice versa.
-                                                // Shall be used with the "In to town" feature. Note that
-                                                // if direction is defined, that shall be direction swapped to.
+                    line: line-id,          // The id of the line
+                    direction: dir,         // Optional. If present only show departures in this direction 
+                                            // for this line.
+                    swapDir: false          // Optional. If true, change dir 1 to 2 and vice versa.
+                                            // Shall be used with the "In to town" feature. Note that
+                                            // if direction is defined, that shall be direction swapped to.
                   }
                 ]
               },
@@ -89,7 +92,8 @@ By default the following sanity checks are done on the configuration. The sanity
 
 * ``updateInterval`` shall be larger or equal to 1 min (1\*60\*1000 milliseconds)
 * ``uiUpdateInterval`` shall be smaller or equal to 10 sec (10\*1000 milliseconds)
-## How to use the stations parameter
+
+## How to use the ``stations`` parameter
 With the ``stations`` configuration parameter you are able to in detail define what you want to see. The basic configuration is that if an optional parameter is not present everything will be shown, i.e. if the ``lines`` parameter is not present for a station all lines will be displayed. However, if it is present you will need to define all lines that you want to see.
 
 ### Examples
@@ -105,7 +109,7 @@ Show all departures from one station:
     ...
 ```
 
-Show all departures from two station:
+Show all departures from **two station**:
 ```
     ...
     stations: [
@@ -120,6 +124,9 @@ Show all departures from two station:
     ]
     ...
 ```
+Please note that having multiple stations will increase the number of API calls made since there's one call per station. You can mitigate this by carefully setting the ``updateInterval`` and ``highUpdateInterval`` configuration parameters.
+
+Also, having multiple stations will increase the space that this module takes on screen so use the ``displaycount`` parameter to limit the number of departures shown.
 
 Show all departures from one station and only line 610 from the other station:
 ```
@@ -160,7 +167,8 @@ Show all departures from one station and only line 610 from the other station in
     ...
 ```
 
-"In To Town" - For one station, show all directions for line 611, for line 616 show only direction 1 (swapDir will change 1->2 and 2->1). Line 616 direction 1 will be shown together with 611 direction 2:
+**"In To Town"**
+If you only want to see the departures "in to town" and your station has several lines that have different directions "in to town" you can configure the module like this. For one station, show all directions for line 611, for line 616 show only direction 1 (swapDir will change 1->2 and 2->1). Line 616 direction 1 will be shown together with 611 direction 2:
 ```
     ...
     stations: [
@@ -181,26 +189,6 @@ Show all departures from one station and only line 610 from the other station in
     ]
     ...
 ```
-
-
-## In to town **OBSOLETE see new linefiltering**
-
-If you only want to see the departures "in to town" and your station has several lines that have different directions "in to town" you can configure the module like this
-```
-    ...
-    lines: ['611', ['312', 2], ['629',2]],   // Show 312 and 629 in direction 2.
-    direction: 1,
-    ...
-```
-This will show line 611 in direction 1 intermixed with line 629 in direction 2 intermixed with line 312 in direction 2 like this
-```
-Line Destination Departure
-611  Town        in 1 min
-629  Town        in 2 min
-611  Town        in 11 min
-312  Somewhere   in 12 min
-```
-The feature has some limitations. It changes internally the direction number for the lines that are represented as ['line#', dir] so that dir for that line will get the value of ``direction``. It will only show departures that go in ``direction`` or in the direction described by the ['line#', dir] format. Hence there will only be one list.
 
 ## Set what times to update more frequently
 If you want the module to update departure
@@ -230,20 +218,6 @@ where
   * ``stop`` is time of day when the high update should stop in hh:mm format
 
 In the example above the module will update the departures every 5th minute but between 7 and 9 weekdays and 16 and 18 on weekends the update will be done every minute. You can have as many entries in the times array as you want.
-
-## Having multiple stations OBSOLETE rewrite
-By adding more then one ``stationid`` in the stationid array you can monitor several stations. If you have multiple stations the ``stationname`` array also need to hold the same number of stationnames.
-
-Example of such config is:
-```
-    ...
-    stationid: [2322, 2326],
-    stationname: ['Erikslund', 'Anbudsvägen'],        
-    ...
-```
-Please note that having multiple stations will increase the number of API calls made since there's one call per station. You can mitigate this by carefully setting the ``updateInterval`` and ``highUpdateInterval`` configuration parameters.
-
-Also, having multiple stations will increase the space that this module takes on screen so use the ``displaycount`` parameter to limit the number of departures shown.
 
 ## Use DisplayTime
 The Trafiklab API will return a number of different departure times, TimeTabledDateTime, ExpectedDateTime and DisplayTime. Originally this module used the two first to calculate the departure time and display it. However, it has turned out that for some metro lines these are null (do not have a value) due to some infrastructure changes going on.
