@@ -9,8 +9,6 @@ You need to obtain your own API key's from TrafikLab for the following API's
 * [SL Realtidinformation 4](https://www.trafiklab.se/api/sl-realtidsinformation-4)
 * [SL Platsuppslag](https://www.trafiklab.se/api/sl-platsuppslag)
 
-~~**Please note**: There's currently some issues at TrafikLab that causes this module to fail sometimes. I have reported the issue and they are working on it. Please follow the thread at [TrafikLab's supportsite]( https://kundo.se/org/trafiklabse/d/problem-med-realtidsinformation-4-och-https/#c2726378)~~
-
 ## Install
 1. Clone repository into ``../modules/`` inside your MagicMirror folder.
 2. Run ``npm install`` inside ``../modules/MMM-SL-PublicTransport/`` folder
