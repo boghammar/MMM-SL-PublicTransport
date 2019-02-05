@@ -53,8 +53,11 @@ modules: [
                   }
                 ]
               },
-            ]
+            ],
+            maxDestinationLength: 999,      // Optional, will truncate the destination string to the set length.
             displaycount: 10,               // Optional, show this number of departures for each direction.
+            omitDeparturesLeft: false,      // Optional, if set to true departures that have left the station
+                                            // is not shown.
             showdisturbances: false,        // Not implemented yet
             fade: true,                     // Optional. Shall the table of departures be faded or not
             fadePoint: 0.2,                 // Optional. Fraction from end where to start fading

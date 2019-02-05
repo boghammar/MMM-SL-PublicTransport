@@ -31,6 +31,7 @@ Module.register("MMM-SL-PublicTransport", {
         showdisturbances: false,
         fade: true,
         fadePoint: 0.2,
+        maxDestinationLength: 999,
         displaycount: 10,
         SSL: false,
         ignoreSanityCheck: false,
@@ -43,7 +44,8 @@ Module.register("MMM-SL-PublicTransport", {
     getScripts: function () {
         return [
             //this.file('timehandler.js')
-            'moment.js'
+            'moment.js',
+            this.file('node_modules/lodash/lodash.js')
         ];
     },
     // --------------------------------------- Define required stylesheets
@@ -187,33 +189,37 @@ Module.register("MMM-SL-PublicTransport", {
                         table.appendChild(row);
                         displayCount = 0; // Restart count of number of items to display for this new direction
                     }
-                    displayCount++;
-                    if (displayCount <= this.config.displaycount) { // Only show displaycount entries
-                        if (this.cdir == -1) this.cdir = dep.JourneyDirection;
-                        var row = document.createElement("tr");
-                        
-                        var td = undefined;
+                    if (!(this.hasLeft(dep.ExpectedDateTime) && this.config.omitDeparturesLeft)) {
+                        displayCount++;
+                        if (displayCount <= this.config.displaycount) { // Only show displaycount entries
+                            if (this.cdir == -1) this.cdir = dep.JourneyDirection;
+                            var row = document.createElement("tr");
+                            
+                            var td = undefined;
 
-                        if (this.config.showIcon) {
-                            td = document.createElement("td");
-                            td.className = 'align-left '+ this.getRideIcon(dep);
-                            td.innerHTML = '&nbsp';
+                            if (this.config.showIcon) {
+                                td = document.createElement("td");
+                                td.className = 'align-left '+ this.getRideIcon(dep);
+                                td.innerHTML = '&nbsp';
+                                row.appendChild(td);
+                            }
+
+                            var td = document.createElement("td");
+                            td.className = 'align-left ';
+                            td.innerHTML = dep.LineNumber;
                             row.appendChild(td);
+
+                            td = document.createElement("td");
+                            td.innerHTML = _.truncate(dep.Destination, {length: this.config.maxDestinationLength}); // dep.Destination;
+                            td.className = 'align-left';
+                            row.appendChild(td);
+                            td = this.getDepartureTimeHTML(dep.TimeTabledDateTime, dep.ExpectedDateTime, dep.DisplayTime);
+                            row.appendChild(td);
+                            table.appendChild(row);
+                            this.setFade(row, displayCount, this.config.displaycount, this.config.fade, this.config.fadePoint);
                         }
-
-                        var td = document.createElement("td");
-                        td.className = 'align-left ';
-                        td.innerHTML = dep.LineNumber;
-                        row.appendChild(td);
-
-                        td = document.createElement("td");
-                        td.innerHTML = dep.Destination;
-                        td.className = 'align-left';
-                        row.appendChild(td);
-                        td = this.getDepartureTime(dep.TimeTabledDateTime, dep.ExpectedDateTime, dep.DisplayTime);
-                        row.appendChild(td);
-                        table.appendChild(row);
-                        this.setFade(row, /*ix*/displayCount, /*this.currentDepartures.departures.length*/this.config.displaycount, this.config.fade, this.config.fadePoint);
+                    } else {
+                        if (this.config.debug) console.log('Not showing ' + dep.LineNumber + ' towards ' + dep.Destination + ' since it has left ExcpectedTime: '+ dep.ExpectedDateTime);
                     }
                 }
             }
@@ -262,9 +268,21 @@ Module.register("MMM-SL-PublicTransport", {
         return '';
     },
 
+    // --------------------------------------- Check if the departure has left
+    hasLeft: function (expectedTime) {
+        if (!this.config.useDisplayTime && (expectedTime != null)) {
+            et = moment(expectedTime);
+            disp = this.timeRemaining(et);
+            return (disp == 'left' || disp == 'now');
+        } else {
+            return false; // TODO To be updated when handling displayTime updates
+        }
+
+    },
+
     // --------------------------------------- Calculate departure time
     // Returns a HTML element that shall be added to the current row
-    getDepartureTime: function (tableTime, expectedTime, displayTime) {
+    getDepartureTimeHTML: function (tableTime, expectedTime, displayTime) {
         var td = document.createElement("td");
 
         if (!this.config.useDisplayTime && ( tableTime != null && expectedTime != null)) {
@@ -275,7 +293,7 @@ Module.register("MMM-SL-PublicTransport", {
             if (dur < this.config.delayThreshhold && dur > -this.config.delayThreshhold) { // (tableTime == expectedTime) { // There's no delay
                 td.innerHTML = this.timeRemaining(tt) + (this.config.debug ? " " + dur : "");
             } else {
-                td.innerHTML = this.timeRemaining(moment(expectedTime)) + ' ';
+                td.innerHTML = this.timeRemaining(et) + ' ';
                 var sp = document.createElement("span");
                 sp.innerHTML = this.timeRemaining(tt, true) + (this.config.debug ? " " + dur : "");
                 sp.style.textDecoration = "line-through" // TODO Change this to a custom style
