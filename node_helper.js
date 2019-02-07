@@ -118,6 +118,7 @@ module.exports = NodeHelper.create({
                     CurrentDepartures.LatestUpdate = resp.ResponseData.LatestUpdate; // Anger när realtidsinformationen (DPS) senast uppdaterades.
                     CurrentDepartures.DataAge = resp.ResponseData.DataAge; //Antal sekunder sedan tidsstämpeln LatestUpdate.
                     CurrentDepartures.obtained = new Date(); //When we got it.
+                    CurrentDepartures.StopPointDeviations = resp.ResponseData.StopPointDeviations;
                     self.addDepartures(station, departures, resp.ResponseData.Metros);
                     self.addDepartures(station, departures, resp.ResponseData.Buses);
                     self.addDepartures(station, departures, resp.ResponseData.Trains);

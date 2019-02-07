@@ -6,6 +6,7 @@ function Departure(data) {
     this.ExpectedDateTime = data.ExpectedDateTime;
     this.JourneyDirection = data.JourneyDirection;
     this.DisplayTime = data.DisplayTime;
+    this.Deviations = data.Deviations;
 }
 
 Departure.prototype.ToString = function() {

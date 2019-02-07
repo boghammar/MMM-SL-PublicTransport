@@ -355,6 +355,8 @@ Module.register("MMM-SL-PublicTransport", {
             if (this.currentDepartures.length> 0) Log.info("Departures updated: " + this.currentDepartures[0].departures.length);
             this.currentDepartures.obtained = new Date();
             this.updateDom();
+            // Tell the disturbance module (or all) of the current departures
+            this.sendNotification("MMM-SL-PublicTransport-DEPARTURES", payload); 
         }
         if (notification == "SERVICE_FAILURE") {
             this.loaded = true;
