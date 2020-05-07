@@ -44,7 +44,8 @@ modules: [
                 lines: [                    // Optional. An array of lines that you want to see departing from
                                             // this station.
                   {
-                    line: line-id,          // The id of the line
+                    line: line-id,          // The id of the line. If its a line with a letter in the line number
+                                            // the line-id has to be a string like "line: '42x'"
                     direction: dir,         // Optional. If present only show departures in this direction 
                                             // for this line.
                     swapDir: false          // Optional. If true, change dir 1 to 2 and vice versa.

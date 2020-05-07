@@ -157,6 +157,7 @@ module.exports = NodeHelper.create({
             })
             .catch(function (err) {
                 log('Problems: station id=' + station.stationId + ' ' + err);
+                log(err);
                 reject( { resp: { StatusCode: 600, Message: err } });
             });
     },
@@ -213,8 +214,14 @@ module.exports = NodeHelper.create({
             if (Array.isArray(station.lines)) {
                 //debug('1')
                 for (var il=0; il < station.lines.length; il++) { // Check if this is a line we want
-                    //debug('2 '+ il)
-                    if (dep.LineNumber == station.lines[il].line) {
+                    //debug('2 '+ il + ' ' + station.lines[il].line + ' ' +dep.LineNumber);
+                    //debug(typeof(dep.LineNumber) === 'string');
+                    //debug(typeof(dep.LineNumber));
+                    l1 = (typeof(dep.LineNumber) === 'string' ? dep.LineNumber.toUpperCase() : dep.LineNumber);
+                    l2 = (typeof(station.lines[il].line) === 'string' ? station.lines[il].line.toUpperCase() : station.lines[il].line);
+                    debug("Lines "+ dep.LineNumber + " checked against "+ station.lines[il].line);
+                    //debug("Lines t "+ typeof(dep.LineNumber) + " checked against t "+ typeof(station.lines[il].line));
+                    if (l1 == l2) {
                         debug("Checking line "+ dep.LineNumber + " Dir: " + dep.JourneyDirection)
                         if (station.lines[il].direction !== undefined) {
                             if (dep.JourneyDirection == station.lines[il].direction) {
