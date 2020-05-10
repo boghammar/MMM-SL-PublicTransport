@@ -57,6 +57,9 @@ modules: [
             ],
             maxDestinationLength: 999,      // Optional, will truncate the destination string to the set length.
             displaycount: 10,               // Optional, show this number of departures for each direction.
+            dontDisplayIfAlmostleft: 3*60,  // Optional, hides departues with time left less then this value in seconds
+                                            // Note that you need to set the omitDeparturesLeft parameter to true for 
+                                            // this to take effect. Also useDisplayTime has to be set to false.
             omitDeparturesLeft: false,      // Optional, if set to true departures that have left the station
                                             // is not shown.
             showdisturbances: false,        // Not implemented yet

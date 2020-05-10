@@ -268,12 +268,17 @@ Module.register("MMM-SL-PublicTransport", {
         return '';
     },
 
-    // --------------------------------------- Check if the departure has left
+    // --------------------------------------- Check if the departure has left or almost left
     hasLeft: function (expectedTime) {
         if (!this.config.useDisplayTime && (expectedTime != null)) {
             et = moment(expectedTime);
             disp = this.timeRemaining(et);
-            return (disp == 'left' || disp == 'now');
+            var now = moment();
+            var dur = et.diff(now, 'seconds');
+            var almostLeft = (this.config.dontDisplayIfAlmostleft ?
+                this.config.dontDisplayIfAlmostleft > dur :
+                false);
+            return (disp == 'left' || disp == 'now' || almostLeft);
         } else {
             return false; // TODO To be updated when handling displayTime updates
         }
