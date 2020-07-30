@@ -1,10 +1,12 @@
 # MMM-SL-PublicTransport
 [Magic Mirror](https://magicmirror.builders/) Module - Display public transport in Stockholm/Sweden. This module use the API's provided by [Trafiklab](https://www.trafiklab.se/api).
 
-![SL PublicTransport Module](https://github.com/boghammar/MMM-SL-PublicTransport/blob/master/docs/MMM-SL-Screenshot.PNG)
+![SL PublicTransport Module](docs/MMM-SL-Screenshot.PNG)
 
 ## Get API key
-You need to obtain your own API key's from TrafikLab for the following API's
+You need to obtain your own API key's from TrafikLab in order to use this module. 
+API keys are free and are obtained by creating an account and a so-called project at [Trafiklab.se](https://trafiklab.se).
+You need to retrieve keys for the following API's:
 
 * [SL Realtidinformation 4](https://www.trafiklab.se/api/sl-realtidsinformation-4)
 * [SL Platsuppslag](https://www.trafiklab.se/api/sl-platsuppslag)
@@ -20,8 +22,11 @@ You need to obtain your own API key's from TrafikLab for the following API's
 2. Run ``npm install`` inside ``../modules/MMM-SL-PublicTransport/`` folder
 
 ## Configuration
-**Note**: In release 1.5 there is a major change of the configuration. Please read through carefully and update your configration appropriately. All features present in earlier releases are available but you need to redefine your configuration. The new configuration ``stations`` will allow you to define in more detail what you want to see. For examples see the section [How to use the stations parameter](#how-to-use-the-stations-parameter) below.
+**Note**: In release 1.5 there is a major change of the configuration. Please read through carefully and update your configration appropriately. 
+All features present in earlier releases are available but you need to redefine your configuration. The new configuration ``stations`` will 
+allow you to define in more detail what you want to see. For examples see the section [How to use the stations parameter](#how-to-use-the-stations-parameter) below.
 
+Keep in mind that your configuration should not exceed the Trafiklab quota of 10.000 API calls per month. You can find more examples on this below 
 ```
 modules: [
     ...
@@ -197,9 +202,12 @@ If you only want to see the departures "in to town" and your station has several
     ...
 ```
 
-## Set what times to update more frequently
-If you want the module to update departure
- times more frequently between certain hours use the ``highUpdateInterval`` config parameter. This is a feature that will preserve API calls to the TrafikLab API's.
+## Frequent update times
+If you want the module to update departure times more frequently between certain hours use the ``highUpdateInterval`` 
+config parameter. By using this parameter, you can reduce the refresh rate during 'quiet' hours, for example once every 6 minutes, 
+but still receive frequent updates (for example, every 2 minutes) when leaving for work of school in the morning.
+You can define the updateInterval for these "high-frequency update periads" per period or for all periods. When you 
+define the updateInterval on a specific period, the general updateInterval will be overwritten.
 
 This parameter is used like this:
 
@@ -210,7 +218,7 @@ This parameter is used like this:
         updateInterval: 1*60*1000,
         times: [
             {days: 'weekdays', start: '07:00', stop: '09:00'},
-            {days: 'weekends', start: '16:00', stop: '18:00'}
+            {days: 'weekends', start: '16:00', stop: '18:00', updateInterval: 2*60*1000}
         ]
     },
     ...
@@ -224,7 +232,7 @@ where
   * ``start`` is time of day when the high update should start in hh:mm format
   * ``stop`` is time of day when the high update should stop in hh:mm format
 
-In the example above the module will update the departures every 5th minute but between 7 and 9 weekdays and 16 and 18 on weekends the update will be done every minute. You can have as many entries in the times array as you want.
+In the example above the module will update the departures every 5th minute but between 7 and 9 weekdays it will update every minute, and 16 and 18 on weekends the update will be done every 2 minutes. You can have as many entries in the times array as you want.
 
 ## Use DisplayTime
 The Trafiklab API will return a number of different departure times, TimeTabledDateTime, ExpectedDateTime and DisplayTime. Originally this module used the two first to calculate the departure time and display it. However, it has turned out that for some metro lines these are null (do not have a value) due to some infrastructure changes going on.
