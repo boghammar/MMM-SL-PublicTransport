@@ -273,9 +273,16 @@ module.exports = NodeHelper.create({
         if (!Array.isArray(this.config.highUpdateInterval.times)) throw new Error("highUpdateInterval.times is not an array")
         
         //Check which interval we are in and return the proper timer
-        for (var ix = 0 ; ix < this.config.highUpdateInterval.times.length; ix++) {
-            var time = this.config.highUpdateInterval.times[ix];
-            if (this.isBetween(time.days, time.start, time.stop)) return this.config.highUpdateInterval.updateInterval
+        for (let i = 0; i < this.config.highUpdateInterval.times.length; i++) {
+            const intervalDefinition = this.config.highUpdateInterval.times[i];
+            if (this.isBetween(intervalDefinition.days, intervalDefinition.start, intervalDefinition.stop)) {
+                if (intervalDefinition.updateInterval !== undefined) {
+                    // If the interval has it's own update frequency defined, use that
+                    return intervalDefinition.updateInterval
+                }
+                // If the interval doesn't have it own update frequency defined, use the high interval frequency.
+                return this.config.highUpdateInterval.updateInterval
+            }
         }
         return this.config.updateInterval;
     },
