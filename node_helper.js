@@ -213,7 +213,13 @@ module.exports = NodeHelper.create({
                 //debug('1')
                 for (var il=0; il < station.lines.length; il++) { // Check if this is a line we want
                     //debug('2 '+ il)
-                    if (dep.LineNumber == station.lines[il].line) {
+                    //debug(typeof(dep.LineNumber) === 'string');
+                    //debug(typeof(dep.LineNumber));
+                    l1 = (typeof(dep.LineNumber) === 'string' ? dep.LineNumber.toUpperCase() : dep.LineNumber);
+                    l2 = (typeof(station.lines[il].line) === 'string' ? station.lines[il].line.toUpperCase() : station.lines[il].line);
+                    debug("Lines "+ dep.LineNumber + " checked against "+ station.lines[il].line);
+                    //debug("Lines t "+ typeof(dep.LineNumber) + " checked against t "+ typeof(station.lines[il].line));
+                    if (l1 == l2) {
                         debug("Checking line "+ dep.LineNumber + " Dir: " + dep.JourneyDirection)
                         if (station.lines[il].direction !== undefined) {
                             if (dep.JourneyDirection == station.lines[il].direction) {

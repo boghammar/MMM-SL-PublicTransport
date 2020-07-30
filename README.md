@@ -49,7 +49,8 @@ modules: [
                 lines: [                    // Optional. An array of lines that you want to see departing from
                                             // this station.
                   {
-                    line: line-id,          // The id of the line
+                    line: line-id,          // The id of the line. If its a line with a letter in the line number
+                                            // the line-id has to be a string like "line: '42x'"
                     direction: dir,         // Optional. If present only show departures in this direction 
                                             // for this line.
                     swapDir: false          // Optional. If true, change dir 1 to 2 and vice versa.
@@ -61,6 +62,9 @@ modules: [
             ],
             maxDestinationLength: 999,      // Optional, will truncate the destination string to the set length.
             displaycount: 10,               // Optional, show this number of departures for each direction.
+            dontDisplayIfAlmostleft: 3*60,  // Optional, hides departues with time left less then this value in seconds
+                                            // Note that you need to set the omitDeparturesLeft parameter to true for 
+                                            // this to take effect. Also useDisplayTime has to be set to false.
             omitDeparturesLeft: false,      // Optional, if set to true departures that have left the station
                                             // is not shown.
             showdisturbances: false,        // Not implemented yet
